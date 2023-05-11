@@ -9,9 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.331.0",
+    "@chakra-ui/react": "^2.6.1",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "aws-sdk": "^2.1376.0",
+    "framer-motion": "^10.12.10",
     "next": "13.4.1",
+    "next-pwa": "^5.6.0",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-icons": "^4.8.0",
+    "sharp": "^0.32.1"
   },
   "devDependencies": {
     "@types/node": "20.1.2",
