@@ -2,8 +2,21 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
+import { useEffect, useState } from 'react'
 
 const Home: NextPage = () => {
+  const [inputFile, setInputFile] = useState<any>();
+
+  useEffect(() => {
+    if (inputFile){
+      let fileReader = new FileReader();
+      fileReader.readAsDataURL(inputFile);
+
+      console.log(fileReader)
+    }
+  }, [inputFile])
+
+
   return (
     <div className={styles.container}>
       <Head>
@@ -51,6 +64,8 @@ const Home: NextPage = () => {
             </p>
           </a>
         </div>
+        <h1>Upload File</h1>
+        <input type="file" onChange={(e) => setInputFile(e.target.files && e.target.files[0])}/>
       </main>
 
       <footer className={styles.footer}>
