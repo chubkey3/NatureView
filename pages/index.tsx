@@ -158,7 +158,7 @@ const Home: NextPage<Props> = ({ images }) => {
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
   try {
-    const res = await axios.get('http://127.0.0.1:3000/api/list')
+    const res = await axios.get((process.env.PROD === 'true') ? 'https://natureview3.vercel.app/api/list' : 'http://127.0.0.1:3000/api/list')
     const images = res.data
 
     return {
