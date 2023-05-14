@@ -1,4 +1,4 @@
-import type { GetStaticProps, NextPage } from 'next'
+import type { GetServerSideProps, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
@@ -156,7 +156,7 @@ const Home: NextPage<Props> = ({ images }) => {
 }
 
 
-export const getStaticProps: GetStaticProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
     const res = await axios.get((process.env.PROD === 'true') ? 'https://natureview3.vercel.app/api/list' : 'http://127.0.0.1:3000/api/list')
     const images = res.data
@@ -164,8 +164,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     return {
       props: {
         images
-      },
-      revalidate: 60
+      }
     }
     
   } catch (error) {

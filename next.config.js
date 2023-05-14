@@ -13,7 +13,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'nature-images.sfo3.digitaloceanspaces.com',
+        hostname: process.env.BUCKET_NAME + '.' + process.env.BUCKET_ENDPOINT,
         port: '',
         pathname: '/images/**'
       }
