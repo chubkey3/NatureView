@@ -87,44 +87,6 @@ const Home: NextPage<Props> = ({ images }) => {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
         <h1>Upload File</h1>
         <input type="file" accept="image/*" onChange={(e) => setInputFiles(e.target.files)} multiple/>
         
@@ -134,7 +96,6 @@ const Home: NextPage<Props> = ({ images }) => {
           <div key={image.ETag}>
             <h3 key={JSON.stringify(image.LastModified)}>{image.LastModified && new Date(image.LastModified).toDateString()}</h3>         
             <Image key={image.Key} width={'100'} height={'100'} alt={'snapshot of nature :)'} src={'https://' + process.env.BUCKET_NAME + '.' + process.env.BUCKET_ENDPOINT + '/' + image.Key}/>
-            <h2 key={image.Key?.split('/')[1]}>{image.Key?.split('/')[1]}</h2>
           </div>
         ))}
       </main>
