@@ -52,7 +52,7 @@ const Home: NextPage<Props> = ({ images }) => {
       setFilesCompleted(0);
       setInputFiles(null);
     }
-  }, [filesCompleted])
+  }, [filesCompleted, inputFiles, router])
 
   useEffect(() => {
     if (inputFiles){
@@ -157,13 +157,14 @@ const Home: NextPage<Props> = ({ images }) => {
 
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const res = await axios.get('http://localhost:3000/api/list')
+  const res = await axios.get('http://127.0.0.1:3000/api/list')
   const images = res.data
 
   return {
     props: {
       images
-    }
+    },
+    revalidate: 60
   }
   
 }
