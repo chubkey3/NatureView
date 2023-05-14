@@ -9,7 +9,16 @@ const nextConfig = {
     BUCKET_ENDPOINT: process.env.BUCKET_ENDPOINT,
     PROD: process.env.PROD
   },
-  
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'nature-images.sfo3.digitaloceanspaces.com',
+        port: '',
+        pathname: '/images/**'
+      }
+    ]
+  }
 }
 
 if (process.env.PROD === "true"){
