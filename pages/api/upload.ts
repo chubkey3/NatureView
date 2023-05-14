@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import s3 from '../init'
+import s3 from '../../utils/init'
 import { PutObjectRequest, PutObjectOutput } from 'aws-sdk/clients/s3'
 
 type Data = string;

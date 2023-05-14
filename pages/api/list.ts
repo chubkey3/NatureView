@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import s3 from '../init'
+import s3 from '../../utils/init'
 import { ListObjectsV2Output, ListObjectsV2Request, ObjectList } from 'aws-sdk/clients/s3'
 
 //type Data = string[] | {message: string}
