@@ -157,15 +157,23 @@ const Home: NextPage<Props> = ({ images }) => {
 
 
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const res = await axios.get('http://127.0.0.1:3000/api/list')
-  const images = res.data
+  try {
+    const res = await axios.get('http://127.0.0.1:3000/api/list')
+    const images = res.data
 
-  return {
-    props: {
-      images
-    },
-    revalidate: 60
+    return {
+      props: {
+        images
+      },
+      revalidate: 60
+    }
+    
+  } catch (error) {
+    return {
+      notFound: true
+    }
   }
+  
   
 }
 
