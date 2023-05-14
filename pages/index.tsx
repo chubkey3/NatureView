@@ -1,19 +1,40 @@
-import type { NextPage } from 'next'
+import type { GetStaticProps, NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useEffect, useState } from 'react'
+import s3 from './init'
+import { PutObjectRequest } from 'aws-sdk/clients/s3'
+import axios from 'axios'
 
-const Home: NextPage = () => {
+type Props = {
+  images: string[]
+}
+
+const Home: NextPage<Props> = ({ images }) => {
   const [inputFile, setInputFile] = useState<any>();
+  const [progress, setProgress] = useState<number>();
 
   useEffect(() => {
     if (inputFile){
-      let fileReader = new FileReader();
-      fileReader.readAsDataURL(inputFile);
+      let params: PutObjectRequest = {
+        Body: inputFile,
+        Bucket: process.env.BUCKET_NAME || "",
+        Key: 'images/' + inputFile.name,
+        ACL: 'public-read'
+      }
 
-      console.log(fileReader)
+      s3.putObject(params, function(err){
+        if (err){
+          console.log(err)
+        } else {
+          console.log("Success!")
+        }
+      }).on('httpUploadProgress', (evt) => {
+        setProgress(Math.round((evt.loaded / evt.total) * 100))
+      })
     }
+    
   }, [inputFile])
 
 
@@ -65,7 +86,11 @@ const Home: NextPage = () => {
           </a>
         </div>
         <h1>Upload File</h1>
-        <input type="file" onChange={(e) => setInputFile(e.target.files && e.target.files[0])}/>
+        <input type="file" accept="image/*" onChange={(e) => setInputFile(e.target.files && e.target.files[0])}/>
+        {progress !== 100 && progress && <h2>Progress: {progress}%</h2>}
+        {images.map((image: string) => (
+          <h3 key={image}>{image}</h3>
+        ))}
       </main>
 
       <footer className={styles.footer}>
@@ -82,6 +107,19 @@ const Home: NextPage = () => {
       </footer>
     </div>
   )
+}
+
+
+export const getStaticProps: GetStaticProps<Props> = async () => {
+  const res = await axios.get('http://localhost:3000/api/list')
+  const images: string[] = res.data
+
+  return {
+    props: {
+      images
+    }
+  }
+  
 }
 
 export default Home

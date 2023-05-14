@@ -1,7 +1,6 @@
 import AWS from 'aws-sdk';
 
-
-const spacesEndpoint = new AWS.Endpoint("sfo3.digitaloceanspaces.com")
+const spacesEndpoint = new AWS.Endpoint(process.env.BUCKET_ENDPOINT || "")
 
 const s3 = new AWS.S3({
     endpoint: spacesEndpoint,
