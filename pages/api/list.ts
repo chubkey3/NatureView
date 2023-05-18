@@ -2,27 +2,26 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import s3 from '../../utils/init'
 import { ListObjectsV2Output, ListObjectsV2Request, ObjectList } from 'aws-sdk/clients/s3'
-
+import prisma from '../../lib/prisma'
+import { Image } from '@prisma/client'
 //type Data = string[] | {message: string}
-type Data = ObjectList | {message: string}
+type Data = Image[] | {message: string}
 
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  
+  let data = await prisma.image.findMany()
 
-  let params: ListObjectsV2Request = {
-    Bucket: process.env.BUCKET_NAME || "",
-    Prefix: "images"
+  if (data) {
+    res.status(200).json(data)
+  } else {
+    res.status(500).json({message: "Internal Server Error!"})
   }
+  
+  
 
-  s3.listObjectsV2(params, function(err, data: ListObjectsV2Output) {
-    if (err) {
-      res.status(500).json({message: "Internal Server Error!"})
-    } else if (data.Contents) {
-     res.status(200).json(data.Contents)
-    }
-  })
 }
 
 
