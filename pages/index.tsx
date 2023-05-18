@@ -31,7 +31,7 @@ const Home: NextPage<Props> = ({ images }) => {
     
   }, [inputFiles])
 
-  const useEffectUpdateDB = useCallback( async () => {
+  const effectUpdateDB = useCallback( async () => {
     await updateDB().then(() => setInputFiles(null))
   }, [updateDB, setInputFiles] )
 
@@ -63,7 +63,7 @@ const Home: NextPage<Props> = ({ images }) => {
 
   useEffect(() => {
     if (inputFiles && filesCompleted === inputFiles.length && inputFiles.length > 0){
-      useEffectUpdateDB().then(() => router.refresh())
+      effectUpdateDB().then(() => router.refresh())
       setFilesCompleted(0);
     }
 
