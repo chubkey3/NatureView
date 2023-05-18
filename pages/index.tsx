@@ -26,7 +26,7 @@ const Home: NextPage<Props> = ({ images }) => {
       for (var i = 0; i<inputFiles.length; i++){
         data.push({filename: inputFiles[i].name, lastModified: new Date(inputFiles[i].lastModified), url: 'https://' + process.env.BUCKET_NAME + '.' + process.env.BUCKET_ENDPOINT + '/images/' + inputFiles[i].name})
       }
-      await axios.post('http://localhost:3000/api/updatedb', {data: data})
+      await axios.post((process.env.PROD === 'true') ? 'https://natureview3.vercel.app/api/updatedb' : 'http://127.0.0.1:3000/api/updatedb', {data: data})
     }
     
   }, [inputFiles])
