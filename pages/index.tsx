@@ -4,7 +4,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { useCallback, useEffect, useState } from 'react'
 import s3 from '../utils/init'
-import { Object, ObjectList, PutObjectRequest } from 'aws-sdk/clients/s3'
+import { PutObjectRequest } from 'aws-sdk/clients/s3'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import { Image as ImageSchema } from '@prisma/client'
@@ -20,13 +20,13 @@ const Home: NextPage<Props> = ({ images }) => {
   
   const router = useRouter();
 
-  const updateDB = useCallback(async () => {
+  const updateDB = useCallback(async () => {    
     let data = [];
     if (inputFiles){
       for (var i = 0; i<inputFiles.length; i++){
         data.push({filename: inputFiles[i].name, lastModified: new Date(inputFiles[i].lastModified), url: 'https://' + process.env.BUCKET_NAME + '.' + process.env.BUCKET_ENDPOINT + '/images/' + inputFiles[i].name})
       }
-      await axios.post((process.env.PROD === 'true') ? 'https://natureview3.vercel.app/api/updatedb' : 'http://127.0.0.1:3000/api/updatedb', {data: data})
+      await axios.post((process.env.NODE_ENV === 'production') ? 'https://natureview3.vercel.app/api/updatedb' : 'http://localhost:3000/api/updatedb', {data: data})
     }
     
   }, [inputFiles])
@@ -67,7 +67,7 @@ const Home: NextPage<Props> = ({ images }) => {
       setFilesCompleted(0);
     }
 
-  }, [filesCompleted, inputFiles, router])
+  }, [filesCompleted, inputFiles, router, effectUpdateDB])
 
   useEffect(() => {
     if (inputFiles){
@@ -135,7 +135,7 @@ const Home: NextPage<Props> = ({ images }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
-    const res = await axios.get((process.env.PROD === 'true') ? 'https://natureview3.vercel.app/api/list' : 'http://127.0.0.1:3000/api/list')
+    const res = await axios.get((process.env.NODE_ENV === 'production') ? 'https://natureview3.vercel.app/api/list' : 'http://localhost:3001/api/list')
     const images = res.data
 
     return {

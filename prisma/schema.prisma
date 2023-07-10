@@ -8,9 +8,11 @@ datasource db {
 }
 
 model Image {
-  filename     String  @db.VarChar(255) @unique @id
+  filename     String   @id @unique @db.VarChar(255)
   lastModified DateTime @db.Date
-  url          String  @db.VarChar(333) @unique
-  category     String? @default("nature")
-  description  String? @db.Text
+  url          String   @unique @db.VarChar(333)
+  category     String?  @default("nature")
+  description  String?  @db.Text
+  width        Int?      @default(100) @db.Int
+  height       Int?      @default(100) @db.Int
 }

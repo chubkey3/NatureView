@@ -7,7 +7,7 @@ const nextConfig = {
     ACCESS_SECRET_KEY: process.env.ACCESS_SECRET_KEY,
     BUCKET_NAME: process.env.BUCKET_NAME,
     BUCKET_ENDPOINT: process.env.BUCKET_ENDPOINT,
-    PROD: process.env.PROD
+    DATABASE_URL: process.env.DATABASE_URL
   },
   images: {
     remotePatterns: [
@@ -21,7 +21,7 @@ const nextConfig = {
   }
 }
 
-if (process.env.PROD === "true"){
+if (process.env.NODE_ENV === "production"){
   const withPWA = require("next-pwa");
 
   const PWAConfig = withPWA({
