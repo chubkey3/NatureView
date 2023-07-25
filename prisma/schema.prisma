@@ -8,11 +8,26 @@ datasource db {
 }
 
 model Image {
-  filename     String   @id @unique @db.VarChar(255)
-  lastModified DateTime @db.Date
-  url          String   @unique @db.VarChar(333)
-  category     String?  @default("nature")
-  description  String?  @db.Text
+  id     String    @id @unique @db.VarChar(255) //change to id
+  lastModified DateTime  @db.Date
+  url          String    @unique @db.VarChar(255)
+  description  String?   @db.Text
   width        Int?      @default(100) @db.Int
   height       Int?      @default(100) @db.Int
+  author       Author    @default(JASON)
+  category     Category? @relation(fields: [categoryName], references: [name])
+
+  categoryName String?
+}
+
+model Category {
+  name  String @id @unique
+  color String @default("#3BB143")
+  icon String?
+  Images Image[]
+}
+
+enum Author {
+  JASON
+  CHRISTINA
 }

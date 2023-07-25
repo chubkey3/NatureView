@@ -1,38 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import s3 from '../../utils/init'
-import { GetObjectOutput, GetObjectRequest } from 'aws-sdk/clients/s3'
+import { Image } from '@prisma/client'
 
-type Data = {
-    data: GetObjectOutput
-}
 
-type ErrorData = {
-    message: string
-}
-
-export default function handler(
+export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<Data | ErrorData>
+    res: NextApiResponse<Image>
   ) {
-    if (req.method === "POST"){
-        let params: GetObjectRequest = {
-            Bucket: process.env.BUCKET_NAME || "",
-            Key: "images/" + req.body.image
+    let image = await prisma.image.findUnique({
+        where: {
+            id: req.body.id
         }
-      
-        s3.getObject(params, function(err, data) {
-            if (err) {
-                if (!req.body.image){
-                    res.status(400).json({message: 'Invalid or Missing File Name.'})                    
-                } else if (err.code === 'NoSuchKey') {
-                    res.status(404).json({message: 'File Not Found.'})               
-                }
-            } else {
-                res.status(200).json({data: data})
-            }
-        })
+    })
+
+    if (image) {
+        res.json(image)
     } else {
-        res.status(400).json({message: 'Not POST Request.'})
+        res.status(404).end()
     }
 }
 

@@ -1,44 +1,44 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import s3 from '../../utils/init'
-import { PutObjectRequest, PutObjectOutput } from 'aws-sdk/clients/s3'
+import prisma from '../../lib/prisma'
+import { Image } from '@prisma/client'
 
-type Data = string;
+type Data = {message: string}
 
-export default function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<Data>
-  ) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+) {
     if (req.method === "POST"){
-        var data = req.body.getAll("image");
+        let params: Image = req.body
 
-        for (var i = 0; i<data.length; i++){
-            let params: PutObjectRequest = {
-                Body: data[i],
-                Bucket: process.env.BUCKET_NAME || "",
-                Key: 'images/' + data[i].name,
-                ACL: 'public-read'
-            }
-        
-            s3.putObject(params, function(err, data: PutObjectOutput){
-                if (err){
-                    console.log(err)
-                    res.status(500).json("Internal Server Error.")
-                } else {
-                    console.log(data)
-                    res.status(200).json("Uploaded!")
-                }
-            })
+        let upload = await prisma.image.create({
+            data: {
+              id: params.id,
+              lastModified: new Date(params.lastModified),
+              url: params.url,
+              description: params.description,
+              author: params.author,
+              categoryName: params.categoryName
+            }        
+          })
+
+        if (upload){
+          res.status(200).json({message: 'Success!'})
+        } else {
+          res.status(400).json({message: 'Invalid Payload.'})
         }
-        
+
     } else {
-        res.status(400).json("Bad Request.")
-    }
-    
+        res.status(400).json({message: 'Must use POST Request.'})
+    }  
+
 }
 
 
 export const config = {
-    api: {
-        externalResolver: true
-    }
+  api: {
+      externalResolver: true
   }
+}
+
+
