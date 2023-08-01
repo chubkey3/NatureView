@@ -8,6 +8,8 @@ interface Params extends Image {
   tags?: string[]
 }
 
+const colors = [ "whiteAlpha", "blackAlpha", "gray", "red", "orange", "yellow", "green", "teal", "blue", "cyan", "purple", "pink", "linkedin", "facebook", "messenger", "whatsapp", "twitter", "telegram" ] 
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
@@ -33,7 +35,7 @@ export default async function handler(
                 connectOrCreate: params.tags ? params.tags.map((tag) => {
                   return {
                     where: {name: tag},
-                    create: {name: tag}
+                    create: {name: tag, color: colors[Math.floor(Math.random() * colors.length)]}
                   }
                 }) : []                              
               }

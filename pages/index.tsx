@@ -2,25 +2,25 @@ import type { GetServerSideProps, NextPage } from 'next'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
-import { Image as ImageSchema } from '@prisma/client'
-import { SimpleGrid, Flex, Text, Link, Divider } from '@chakra-ui/react'
+import { Image as ImageSchema, Tag as TagSchema } from '@prisma/client'
+import { SimpleGrid, Flex, Text, Link, Divider, Tag, HStack } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 
-type Props = {
-  images: ImageSchema[]
+interface ImageSchemaWithTags extends ImageSchema {
+  tags?: TagSchema[]
 }
 
 type Data = {
-  [key: string]: ImageSchema[]
+  [key: string]: ImageSchemaWithTags[]
 }
 
-type Test = {
+type Props = {
   images: Data  
 }
 
 let quality = 430;
 
-const Home: NextPage<Test> = ({ images }) => {
+const Home: NextPage<Props> = ({ images }) => {
 
   const router = useRouter()
 
@@ -34,8 +34,15 @@ const Home: NextPage<Test> = ({ images }) => {
             <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
             <SimpleGrid columns={[2,3,4]}>
               {images[date].map((image) => (
-                <Flex key={image.id} m={'4px'}>
-                  <Image style={{objectFit: 'cover'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} loading={'eager'} key={image.url} alt={'snapshot of nature :)'} src={image.url}/>
+                <Flex key={image.id} m={'4px'} flexDir={'column'}>
+                  <Image style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} loading={'eager'} key={image.url} alt={'snapshot of nature :)'} src={image.url}/>                  
+                  
+                  <HStack flexWrap={'wrap'} mt={'10px'}>
+                  {image.tags?.map((tag) => (
+                    <Tag key={tag.name} size={'sm'} fontSize={['10px', '11px', '12px']} maxW={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
+                  ))
+                  }           
+                  </HStack>       
                 </Flex>
               ))}
             </SimpleGrid>
@@ -71,7 +78,7 @@ const Home: NextPage<Test> = ({ images }) => {
         </div>
 */
 
-export const getServerSideProps: GetServerSideProps<Test> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
     const res = await axios.get((process.env.NODE_ENV === 'production') ? 'https://natureview3.vercel.app/api/list' : 'http://localhost:3000/api/list')
     const images = res.data

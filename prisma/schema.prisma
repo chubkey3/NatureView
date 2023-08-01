@@ -18,7 +18,7 @@ model Image {
 
 model Tag {
   name  String @id @unique
-  color String @default("#3BB143")
+  color String @default("green")
   icon String?
   Images Image[]
 }

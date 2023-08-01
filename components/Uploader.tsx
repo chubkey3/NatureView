@@ -3,11 +3,12 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import s3 from '../utils/init'
 import { nanoid } from 'nanoid'
 import axios from "axios";
-import { Flex, Input, Box, Text, Link, Button, HStack } from '@chakra-ui/react';
+import { Flex, Input, Box, Text, Link, Button, HStack, Spinner } from '@chakra-ui/react';
 import { BsImages } from 'react-icons/bs'
 import { useRouter } from 'next/router';
 import UploadConfigure from './UploadConfigure';
 import { AiOutlinePlus } from 'react-icons/ai'
+import { Tag } from '@prisma/client';
 
 
 interface ImageOptions {
@@ -24,13 +25,17 @@ const Uploader = () => {
     const [completedUploads, updateCompletedUploads] = useState<number>(0);
     const [uploading, toggleUploading] = useState<boolean>(false);
     const [imgOptions, setImgOptions] = useState<ImageOptions>({});
+    const [tags, setTags] = useState<Tag[]>([]);
 
     const inputRef = useRef<HTMLInputElement>(null);
 
     const router = useRouter();
 
-    const uploadImages = useCallback(() => {
-        if (inputFiles){
+    const uploadImages = useCallback(() => {        
+        if (inputFiles.length > 0){
+        
+          toggleUploading(true);
+          
           for (let i = 0; i<inputFiles.length; i++){
             let params: PutObjectRequest = {
               Body: inputFiles[i],
@@ -68,6 +73,11 @@ const Uploader = () => {
         }
     }, [inputFiles, completedUploads])
 
+    useEffect(() => {
+        axios.get('/api/tags')
+        .then((res) => setTags(res.data))
+    }, [])
+
     const handleDrag = useCallback((e: any) => {
         e.preventDefault()
         e.stopPropagation()
@@ -97,45 +107,47 @@ const Uploader = () => {
 
       
     return (
-        <Flex w={'50%'} maxW={'450px'} flexDir={'column'} justifyContent={'center'} alignItems={'center'}>
-            {<Flex hidden={inputFiles.length === 0 ? false : true} p={5} w={'100%'} h={'200px'} alignItems={'center'} justifyContent={'center'} border={'2px dashed #557A46'} cursor={'pointer'} onDrop={handleDrop} onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onClick={triggerFileUpload} bgColor={dragActive ? 'green.300' : 'green.200'}>
+        <Flex w={'50%'} maxW={'450px'} flexDir={'column'} alignItems={'center'} h={'75vh'}>
+            <Flex hidden={inputFiles.length === 0 ? false : true} p={5} w={'100%'} h={'200px'} alignItems={'center'} justifyContent={'center'} border={'3px dashed rgb(134, 239, 172)'} cursor={'pointer'} onDrop={handleDrop} onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onClick={triggerFileUpload} bgColor={dragActive ? 'green.200' : '#dcfce7'}>
                 <Input ref={inputRef} hidden={true} type="file" accept="image/*" onChange={(e) => setInputFiles(Array.from(e.target.files || []))} multiple/>
-                <Flex flexDir={'column'} alignItems={'center'}>
+                <Flex flexDir={'column'} alignItems={'center'} color={'green.700'}>
                     <BsImages fontSize={'60px'}/>  
                     <Text mt={5} fontSize={'xl'}>Drag & drop to upload</Text>
                     <Text>or click to browse files</Text>
                                              
                 </Flex>
-            </Flex>}
-            {inputFiles.length > 0 && !uploading && 
-                <HStack w={'80vw'} overflowX={'auto'} spacing={5} justifyContent={'center'} my={'20px'} h={'50vh'}>
+            </Flex>
+
+            {inputFiles.length > 0 && 
+                <HStack w={'90vw'} overflowX={'auto'} overflowY={'hidden'} spacing={5} h={'85%'} m={0} alignItems={'start'} justifyContent={['left', 'left', 'center']}>
                     {inputFiles.map((image) => (
-                        <UploadConfigure img={image} setOptionsParent={setImgOptions} key={image.name}/>
+                        <UploadConfigure img={image} tags={tags} setOptionsParent={setImgOptions} key={image.name}/>
                     ))
                     }
-                    <Flex w={'100px'} h={'100%'} borderRadius={'lg'} justifyContent={'center'} alignItems={'center'} bgColor={'gray.300'} onClick={triggerFileUpload} cursor={'pointer'}>
+                    <Flex maxH={['360px', '370px', '380px']} w={'100px'} h={'100%'} borderRadius={'lg'} justifyContent={'center'} alignItems={'center'} color={'green.100'} bgColor={'green.400'} border={'2px solid'} borderColor={'green.200'} onClick={triggerFileUpload} cursor={'pointer'}>
                         <AiOutlinePlus fontSize={90}/>
                     </Flex>
                 </HStack>
-                }    
-            <Button colorScheme={'whatsapp'} onClick={uploadImages} mt={'10px'}>Upload</Button>
-            {/*<Select/>*/}
-            <Flex w={'100%'}>
-                {(uploading ) && 
-                    <Flex w={'100%'} flexDir={'column'}>
-                        <Box w={`${100 * (completedUploads / inputFiles.length)}%`} transition={'width 0.5s ease-out'} h={'10px'} marginTop={'10px'} bgColor={'#0AA653'}/>
-                        <Text>{completedUploads}/{inputFiles.length}</Text>
-                    </Flex>
-                }     
-            </Flex> 
+            }
+
+            {!(completedUploads === inputFiles.length && completedUploads !== 0) && !uploading && <Button colorScheme={'whatsapp'} onClick={uploadImages} mt={'10px'}>Upload</Button>}
+
+            {uploading && <Flex w={'100%'} flexDir={'column'} alignItems={'center'} mt={'10vh'}>
+                <Spinner/>
+                <Flex w={'100%'} flexDir={'column'}>
+                    <Box w={`${100 * (completedUploads / inputFiles.length)}%`} transition={'width 0.5s ease-out'} h={'10px'} marginTop={'10px'} bgColor={'#0AA653'}/>
+                    <Text>{completedUploads}/{inputFiles.length}</Text>
+                </Flex>                
+            </Flex>} 
+
             {(completedUploads === inputFiles.length && completedUploads !== 0) && 
-                <Flex flexDir={'column'} textAlign={'center'} alignItems={'center'} mt={'5vh'} maxW={'80vw'}>
-                    <Text fontSize={'xl'} fontWeight={'bold'}>
+                <Flex flexDir={'column'} textAlign={'center'} alignItems={'center'} maxW={'80vw'}>
+                    <Text fontSize={'lg'} color={'green.800'} fontWeight={'bold'}>
                         Files Uploaded!
                     </Text>
-                    <Text mt={5} fontSize={'md'}>Click <Link onClick={() => router.push('/')} color={'green.500'} textDecor={'underline'}>Here</Link> to view your uploaded images!</Text>
+                    <Text mt={'10px'} fontSize={'sm'}>Click <Link onClick={() => router.push('/')} color={'green.500'} textDecor={'underline'}>Here</Link> to view!</Text>
                 </Flex>
-            }
+            }             
         </Flex>
     )
 }

@@ -16,6 +16,9 @@ export default async function handler(
   let data = await prisma.image.findMany({
     orderBy: {
       lastModified: 'desc'
+    },
+    include: {
+      tags: true
     }
   })  
 
