@@ -18,8 +18,7 @@ type Test = {
   images: Data  
 }
 
-let quality = 500;
-let test = [];
+let quality = 430;
 
 const Home: NextPage<Test> = ({ images }) => {
 
@@ -36,7 +35,7 @@ const Home: NextPage<Test> = ({ images }) => {
             <SimpleGrid columns={[2,3,4]}>
               {images[date].map((image) => (
                 <Flex key={image.id} m={'4px'}>
-                  <Image style={{objectFit: 'cover'}} priority={true} placeholder='empty' loading={'eager'} key={image.url} width={quality} height={0} alt={'snapshot of nature :)'} src={image.url}/>
+                  <Image style={{objectFit: 'cover'}} sizes={'(max-width: 500px) 50vw, (max-width: 1200px) 33vw, 25vw'} width={quality} height={0} priority={true} loading={'eager'} key={image.url} alt={'snapshot of nature :)'} src={image.url}/>
                 </Flex>
               ))}
             </SimpleGrid>
