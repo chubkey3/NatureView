@@ -11,8 +11,9 @@ const Header = () => {
         <>
             <Head>
                 <title>NatureView</title>
+                <html lang={'en'}/>
                 <meta name="description" content="A Website to View Snapshots of Nature" />
-                <link rel="icon" href="/logo.svg" />
+                <link rel="icon" href="/logo.svg" />                
             </Head>
             <Flex alignSelf={'start'} alignItems={'center'} pl={'2.0rem'} pb={'2rem'} pt={'1.5rem'}>
                 <Flex alignItems={'center'} cursor={'pointer'} onClick={() => router.push('/')}>
