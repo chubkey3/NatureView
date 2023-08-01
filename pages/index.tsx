@@ -3,29 +3,46 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
 import { Image as ImageSchema } from '@prisma/client'
-import { SimpleGrid, Flex, Text, Link, IconButton } from '@chakra-ui/react'
+import { SimpleGrid, Flex, Text, Link, Divider } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
-import { AiFillGithub } from 'react-icons/ai'
 
 type Props = {
   images: ImageSchema[]
 }
 
-const Home: NextPage<Props> = ({ images }) => {
+type Data = {
+  [key: string]: ImageSchema[]
+}
+
+type Test = {
+  images: Data  
+}
+
+let quality = 500;
+let test = [];
+
+const Home: NextPage<Test> = ({ images }) => {
 
   const router = useRouter()
 
   return (
     <div className={styles.container}>            
       <main className={styles.main}>   
-        {(images.length > 0) ?
-        <SimpleGrid mt={'6vh'} columns={[2,3,4]} w={'90vw'}>
-          {images.map((image) => (
-            <Flex key={image.id} m={'4px'}>
-              <Image style={{objectFit: 'cover', borderRadius: '8px'}} priority={false} placeholder='empty' loading={'lazy'} key={image.url} width={500} height={281.25} alt={'snapshot of nature :)'} src={image.url}/>
-            </Flex>
-          ))}
-        </SimpleGrid>
+        {(Object.keys(images).length > 0) ?
+        (Object.keys(images).map((date) => (
+          <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
+            <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
+            <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
+            <SimpleGrid columns={[2,3,4]}>
+              {images[date].map((image) => (
+                <Flex key={image.id} m={'4px'}>
+                  <Image style={{objectFit: 'cover'}} priority={true} placeholder='empty' loading={'eager'} key={image.url} width={quality} height={0} alt={'snapshot of nature :)'} src={image.url}/>
+                </Flex>
+              ))}
+            </SimpleGrid>
+          </Flex>
+        ))
+        )
         :
         <Flex flexDir={'column'} textAlign={'center'} alignItems={'center'} maxW={'80vw'}>
           <Text fontSize={'xl'} fontWeight={'bold'}>
@@ -34,10 +51,12 @@ const Home: NextPage<Props> = ({ images }) => {
           <Text mt={5} fontSize={'md'}>Click <Link onClick={() => router.push('/upload')} color={'green.500'} textDecor={'underline'}>Here</Link> to start a beautiful collection of nature images!</Text>
         </Flex>
         }
+        {/*
         <Flex mt={'3vh'} justifyContent={'center'} alignItems={'center'} cursor={'pointer'} onClick={() => router.push('https://github.com/chubkey3')} border={'2px solid'} color={'black'} bgColor={'green.100'} borderColor={'green.500'} borderRadius={'20px'} px={3} py={2}>
           <Text fontSize={'lg'} mr={0.5}>Chubkey</Text>
           <AiFillGithub fontSize={'26px'}/>
         </Flex>
+      */}
       </main>  
     </div>
   )
@@ -53,7 +72,7 @@ const Home: NextPage<Props> = ({ images }) => {
         </div>
 */
 
-export const getServerSideProps: GetServerSideProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Test> = async () => {
   try {
     const res = await axios.get((process.env.NODE_ENV === 'production') ? 'https://natureview3.vercel.app/api/list' : 'http://localhost:3000/api/list')
     const images = res.data

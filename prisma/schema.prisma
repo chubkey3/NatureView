@@ -11,16 +11,12 @@ model Image {
   id     String    @id @unique @db.VarChar(255) //change to id
   lastModified DateTime  @db.Date
   url          String    @unique @db.VarChar(255)
-  description  String?   @db.Text
-  width        Int?      @default(100) @db.Int
-  height       Int?      @default(100) @db.Int
+  description  String?   @db.Text  
   author       Author    @default(JASON)
-  category     Category? @relation(fields: [categoryName], references: [name])
-
-  categoryName String?
+  tags         Tag[]
 }
 
-model Category {
+model Tag {
   name  String @id @unique
   color String @default("#3BB143")
   icon String?

@@ -4,13 +4,24 @@ import { Image } from '@prisma/client'
 
 type Data = {message: string}
 
+interface Params extends Image {
+  tags?: string[]
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
     if (req.method === "POST"){
-        let params: Image = req.body
+        let params: Params = req.body
+        let test = []
 
+        if (params.tags) {
+          for (const tag of params.tags) {
+            test.push({name: tag})
+          }
+        }
+        
         let upload = await prisma.image.create({
             data: {
               id: params.id,
@@ -18,7 +29,14 @@ export default async function handler(
               url: params.url,
               description: params.description,
               author: params.author,
-              categoryName: params.categoryName
+              tags: {
+                connectOrCreate: params.tags ? params.tags.map((tag) => {
+                  return {
+                    where: {name: tag},
+                    create: {name: tag}
+                  }
+                }) : []                              
+              }
             }        
           })
 
