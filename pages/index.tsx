@@ -5,6 +5,7 @@ import axios from 'axios'
 import { Image as ImageSchema, Tag as TagSchema } from '@prisma/client'
 import { SimpleGrid, Flex, Text, Link, Divider, Tag, HStack } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 
 interface ImageSchemaWithTags extends ImageSchema {
   tags?: TagSchema[]
@@ -24,16 +25,68 @@ const Home: NextPage<Props> = ({ images }) => {
 
   const router = useRouter()
 
+  const [page, setPage] = useState<number>(1);
+  const [data, setData] = useState<Data>(images);
+  const [lastHeight, setLastHeight] = useState<number>(0)
+
+  const updateImages = useCallback(() => {
+    axios.post('/api/list', {page: page})
+    .then((res) => {
+
+      let combined = Object.assign({}, data);
+
+      for (const date in res.data) {
+        if (Object.keys(combined).indexOf(date) < 0) {
+          combined[date] = res.data[date]
+        } else {
+          combined[date] = combined[date].concat(res.data[date])
+        }
+      }      
+      
+      setData(combined)
+
+    })
+  }, [data, page])
+
+  const onScroll = useCallback(() => {
+    let height = (document.documentElement.scrollHeight - window.innerHeight) * 3/4;
+   
+    if (window.scrollY >= height) {
+      if (height > lastHeight){
+        setLastHeight(height)
+      }
+    }
+  }, [lastHeight])
+
+  useEffect(() => {
+    if (lastHeight){
+      setPage(prevState => prevState + 1)    
+    }
+  }, [lastHeight])
+
+  useEffect(() => {
+    if (page > 1) {
+      updateImages()
+    }
+  }, [page])
+
+  useEffect(() => {
+    window.addEventListener('scroll', onScroll)
+
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [onScroll])
+
+
   return (
     <div className={styles.container}>            
-      <main className={styles.main}>   
-        {(Object.keys(images).length > 0) ?
-        (Object.keys(images).map((date) => (
+      <main className={styles.main}>                  
+        {(Object.keys(data).length > 0) ?
+        (Object.keys(data).map((date) => (
           <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
             <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
             <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
             <SimpleGrid columns={[2,3,4]}>
-              {images[date].map((image) => (
+              {data[date].map((image) => (
                 <Flex key={image.id} m={'4px'} flexDir={'column'}>
                   <Image style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} loading={'eager'} key={image.url} alt={'snapshot of nature :)'} src={image.url}/>                  
                   
@@ -57,12 +110,6 @@ const Home: NextPage<Props> = ({ images }) => {
           <Text mt={5} fontSize={'md'}>Click <Link onClick={() => router.push('/upload')} color={'green.500'} textDecor={'underline'}>Here</Link> to start a beautiful collection of nature images!</Text>
         </Flex>
         }
-        {/*
-        <Flex mt={'3vh'} justifyContent={'center'} alignItems={'center'} cursor={'pointer'} onClick={() => router.push('https://github.com/chubkey3')} border={'2px solid'} color={'black'} bgColor={'green.100'} borderColor={'green.500'} borderRadius={'20px'} px={3} py={2}>
-          <Text fontSize={'lg'} mr={0.5}>Chubkey</Text>
-          <AiFillGithub fontSize={'26px'}/>
-        </Flex>
-      */}
       </main>  
     </div>
   )
@@ -80,7 +127,7 @@ const Home: NextPage<Props> = ({ images }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
-    const res = await axios.get((process.env.NODE_ENV === 'production') ? 'https://natureview3.vercel.app/api/list' : 'http://localhost:3000/api/list')
+    const res = await axios.post((process.env.NODE_ENV === 'production') ? 'https://natureview3.vercel.app/api/list' : 'http://localhost:3000/api/list', {page: 1})
     const images = res.data
 
     return {

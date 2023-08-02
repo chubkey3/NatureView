@@ -62,12 +62,6 @@ const Uploader = () => {
     }, [inputFiles, imgOptions])
 
     useEffect(() => {
-        if (inputFiles.length > 0) {
-            //uploadImages()
-        }
-    }, [inputFiles, uploadImages])
-
-    useEffect(() => {
         if (inputFiles.length > 0 && completedUploads === inputFiles.length) {
             toggleUploading(false);
         }
@@ -109,7 +103,7 @@ const Uploader = () => {
     return (
         <Flex w={'50%'} maxW={'450px'} flexDir={'column'} alignItems={'center'} h={'75vh'}>
             <Flex hidden={inputFiles.length === 0 ? false : true} p={5} w={'100%'} h={'200px'} alignItems={'center'} justifyContent={'center'} border={'3px dashed rgb(134, 239, 172)'} cursor={'pointer'} onDrop={handleDrop} onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onClick={triggerFileUpload} bgColor={dragActive ? 'green.200' : '#dcfce7'}>
-                <Input ref={inputRef} hidden={true} type="file" accept="image/*" onChange={(e) => setInputFiles(Array.from(e.target.files || []))} multiple/>
+                <Input ref={inputRef} hidden={true} type="file" accept="image/*" onChange={(e) => setInputFiles(Array.from(inputFiles).concat(Array.from(e.target.files || [])))} multiple/>
                 <Flex flexDir={'column'} alignItems={'center'} color={'green.700'}>
                     <BsImages fontSize={'60px'}/>  
                     <Text mt={5} fontSize={'xl'}>Drag & drop to upload</Text>
@@ -119,7 +113,7 @@ const Uploader = () => {
             </Flex>
 
             {inputFiles.length > 0 && 
-                <HStack w={'90vw'} overflowX={'auto'} overflowY={'hidden'} spacing={5} h={'85%'} m={0} alignItems={'start'} justifyContent={['left', 'left', 'center']}>
+                <HStack maxH={'400px'} w={'90vw'} overflowX={'auto'} overflowY={'hidden'} spacing={5} h={'75%'} m={0} alignItems={'start'} justifyContent={['left', 'left', 'center']}>
                     {inputFiles.map((image) => (
                         <UploadConfigure img={image} tags={tags} setOptionsParent={setImgOptions} key={image.name}/>
                     ))
@@ -130,7 +124,7 @@ const Uploader = () => {
                 </HStack>
             }
 
-            {!(completedUploads === inputFiles.length && completedUploads !== 0) && !uploading && <Button colorScheme={'whatsapp'} onClick={uploadImages} mt={'10px'}>Upload</Button>}
+            {!(completedUploads === inputFiles.length && completedUploads !== 0) && !uploading && <Button colorScheme={'whatsapp'} onClick={uploadImages} mt={'15px'}>Upload</Button>}
 
             {uploading && <Flex w={'100%'} flexDir={'column'} alignItems={'center'} mt={'10vh'}>
                 <Spinner/>

@@ -12,18 +12,21 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  
+
+  let take = 20;
+    
   let data = await prisma.image.findMany({
     orderBy: {
       lastModified: 'desc'
     },
     include: {
       tags: true
-    }
+    },
+    ...(req.body.page ? {take: take} : {}),
+    ...(req.body.page ? {skip: (req.body.page - 1) * take} : {})
   })  
 
   let test: Test = {}
-
 
   //parse data and group by month
   if (data) {
