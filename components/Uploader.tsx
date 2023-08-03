@@ -58,7 +58,7 @@ const Uploader = () => {
             .then(() => {
                 if (!params.Key) return
                 let url = `https://${process.env.BUCKET_NAME}.${process.env.BUCKET_ENDPOINT}/${params.Key}`
-                let id = params.Key.split('/').pop()
+                let id = params.Key.split('/').pop()?.split('.')[0]
                 
                 axios.post('/api/upload', {...{id: id, url: url, lastModified: inputFiles[i].lastModified}, ...{...imgOptions[inputFiles[i].name]}}, {
                     onUploadProgress(progressEvent) {
@@ -112,13 +112,13 @@ const Uploader = () => {
 
       
     return (
-        <Flex w={'50%'} maxW={'450px'} flexDir={'column'} alignItems={'center'} h={'75vh'}>
+        <Flex w={'60%'} maxW={'450px'} flexDir={'column'} justifyContent={(inputFiles.length > 0) ? ['start', 'center'] : 'center'} alignItems={'center'} h={'75vh'}>
             <Flex hidden={inputFiles.length === 0 ? false : true} p={5} w={'100%'} h={'200px'} alignItems={'center'} justifyContent={'center'} border={'3px dashed rgb(134, 239, 172)'} cursor={'pointer'} onDrop={handleDrop} onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onClick={triggerFileUpload} bgColor={dragActive ? 'green.200' : '#dcfce7'}>
                 <Input ref={inputRef} hidden={true} type="file" accept="image/*" onChange={(e) => setInputFiles(Array.from(inputFiles).concat(Array.from(e.target.files || [])))} multiple/>
                 <Flex flexDir={'column'} alignItems={'center'} color={'green.700'}>
                     <BsImages fontSize={'60px'}/>  
                     <Text mt={5} fontSize={'xl'}>Drag & drop to upload</Text>
-                    <Text>or click to browse files</Text>
+                    <Text mt={2}>or click to browse files</Text>
                                              
                 </Flex>
             </Flex>
