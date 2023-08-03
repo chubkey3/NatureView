@@ -3,7 +3,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
 import { Image as ImageSchema, Tag as TagSchema } from '@prisma/client'
-import { SimpleGrid, Flex, Text, Link, Divider, Tag } from '@chakra-ui/react'
+import { SimpleGrid, Flex, Text, Link, Divider, Tag, useToast } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import convertImage from '../experimental/convertImage'
@@ -26,6 +26,7 @@ let quality = 430;
 const Home: NextPage<Props> = ({ images }) => {
 
   const router = useRouter()
+  const toast = useToast()
 
   const [page, setPage] = useState<number>(1);
   const [data, setData] = useState<Data>(images);
@@ -63,6 +64,15 @@ const Home: NextPage<Props> = ({ images }) => {
       }
     }
   }, [lastHeight])
+
+  useEffect(() => {
+    if (router.query.success) {
+      toast.closeAll()
+      toast({title: 'Success!', description: 'Image successfully removed!', status: 'success', duration: 4000, isClosable: true})
+      router.push('/', undefined, { shallow: true })
+    }
+   
+  }, [router, toast])
 
   useEffect(() => {
     if (lastHeight){

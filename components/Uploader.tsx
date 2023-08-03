@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import UploadConfigure from './UploadConfigure';
 import { AiOutlinePlus } from 'react-icons/ai'
 import { Tag } from '@prisma/client';
+import s3 from '../util/S3init';
 
 
 interface ImageOptions {
@@ -18,14 +19,6 @@ interface ImageOptions {
     }
 }
 
-const s3 = new S3Client({
-    endpoint: 'https://' + process.env.BUCKET_ENDPOINT,
-    region: process.env.BUCKET_REGION,    
-    credentials: {
-        accessKeyId: process.env.ACCESS_KEY_ID || "",
-        secretAccessKey: process.env.ACCESS_SECRET_KEY || ""
-    }
-})
 
 const Uploader = () => {
     const [inputFiles, setInputFiles] = useState<File[]>([]);

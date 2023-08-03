@@ -1,4 +1,4 @@
-import { Card, CardBody, CardFooter, Flex, Icon, IconButton, Skeleton, Spinner, Text } from "@chakra-ui/react"
+import { Card, CardBody, CardFooter, Flex, Icon, IconButton, Skeleton, Spinner, Text, useToast } from "@chakra-ui/react"
 import { Image as ImageSchema } from "@prisma/client"
 import axios from "axios"
 import { GetServerSideProps, NextPage } from "next"
@@ -8,14 +8,31 @@ import { BsFillPersonFill } from "react-icons/bs"
 import { FiEdit } from 'react-icons/fi'
 import { IoMdArrowRoundBack } from 'react-icons/io'
 import { BiTime } from 'react-icons/bi'
-import { useState } from "react"
+import { useCallback, useState } from "react"
+import { HiOutlineTrash } from 'react-icons/hi'
+
+
 type Props = {
     image: ImageSchema
 }
-//edit feature
+
 const ImagePage: NextPage<Props> = ({image}) => {
     const router = useRouter()
+    const toast = useToast()
+
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
+
+    const removeImage = useCallback(() => {
+
+        toast({title: 'Deleting Image!', status: 'loading', duration: 3000, isClosable: true})
+
+        let filename = image.url.split('/').pop();
+        
+        axios.post('/api/delete', {filename: filename})
+        .then(() => router.push('/?success=true'))
+        .catch(() => toast({title: 'Error!', description: 'An error encountered deleting the image!', status: 'error', duration: 3000}))
+
+    }, [image, router, toast])
 
     return (
         <Flex justifyContent={'center'} alignItems={'center'} flexDir={'column'}>            
@@ -23,7 +40,10 @@ const ImagePage: NextPage<Props> = ({image}) => {
                 <IconButton aria-label="back buttton" as={IoMdArrowRoundBack} colorScheme="green" ml={1} size={'sm'} onClick={() => router.push('/')}/>                
             </Flex>
             <Card w={'60%'} mt={['10px', '20px']} display={'flex'}  minW={'300px'} mb={'100px'}>        
-                <IconButton size={'sm'} aria-label="edit image" alignSelf={'end'} m={2} as={FiEdit} colorScheme="green" p={1}/>        
+                <Flex alignSelf={['initial', 'end']} justifyContent={'space-between'} mb={1}>
+                    <IconButton size={'sm'} aria-label="edit image" m={2} as={FiEdit} colorScheme="blue" p={1}/>        
+                    <IconButton size={'sm'} aria-label="edit image" m={2} as={HiOutlineTrash} colorScheme="red" p={1} onClick={removeImage}/>                            
+                </Flex>
                 <Flex justifyContent={'center'}>
                     <Flex w={['80%', '60%']} pos={'relative'} alignItems={'center'} justifyContent={'center'}>
                         {!isLoaded && <Spinner pos={'absolute'} my={'20px'} size={'xl'}/>}
