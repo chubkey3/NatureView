@@ -1,6 +1,5 @@
-import { PutObjectRequest } from 'aws-sdk/clients/s3'
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 import { useState, useCallback, useEffect, useRef } from "react";
-import s3 from '../utils/init'
 import { nanoid } from 'nanoid'
 import axios from "axios";
 import { Flex, Input, Box, Text, Link, Button, HStack, Spinner } from '@chakra-ui/react';
@@ -19,6 +18,15 @@ interface ImageOptions {
     }
 }
 
+const s3 = new S3Client({
+    endpoint: 'https://sfo3.digitaloceanspaces.com',
+    region: 'us-west-3',    
+    credentials: {
+        accessKeyId: process.env.ACCESS_KEY_ID || "",
+        secretAccessKey: process.env.ACCESS_SECRET_KEY || ""
+    }
+})
+
 const Uploader = () => {
     const [inputFiles, setInputFiles] = useState<File[]>([]);
     const [dragActive, setDragActive] = useState<boolean>(false);
@@ -34,29 +42,32 @@ const Uploader = () => {
     const uploadImages = useCallback(() => {        
         if (inputFiles.length > 0){
         
-          toggleUploading(true);
+            toggleUploading(true);
           
-          for (let i = 0; i<inputFiles.length; i++){
-            let params: PutObjectRequest = {
-              Body: inputFiles[i],
-              Bucket: process.env.BUCKET_NAME || "",
-              Key: 'images/' + nanoid() + '.' + inputFiles[i].name.split('.').pop(),          
-              ACL: 'public-read'       
+            for (let i = 0; i<inputFiles.length; i++) {
+                let params = {
+                Body: inputFiles[i],
+                Bucket: 'nature-images',
+                Key: 'images/' + nanoid() + '.' + inputFiles[i].name.split('.').pop(),          
+                ACL: 'public-read'       
             }
-      
-            s3.putObject(params, () => {
-              let url = `https://${process.env.BUCKET_NAME}.${process.env.BUCKET_ENDPOINT}/${params.Key}`
-              let id = params.Key.split('/').pop()
             
-              axios.post('/api/upload', {...{id: id, url: url, lastModified: inputFiles[i].lastModified}, ...{...imgOptions[inputFiles[i].name]}}, {
-                onUploadProgress(progressEvent) {
-                    if (progressEvent.total && progressEvent.loaded/progressEvent.total === 1) {
-                        updateCompletedUploads(prevState => prevState + 1);
+            const command = new PutObjectCommand(params)
+            
+            s3.send(command)
+            .then(() => {
+                if (!params.Key) return
+                let url = `https://${process.env.BUCKET_NAME}.${process.env.BUCKET_ENDPOINT}/${params.Key}`
+                let id = params.Key.split('/').pop()
+                
+                axios.post('/api/upload', {...{id: id, url: url, lastModified: inputFiles[i].lastModified}, ...{...imgOptions[inputFiles[i].name]}}, {
+                    onUploadProgress(progressEvent) {
+                        if (progressEvent.total && progressEvent.loaded/progressEvent.total === 1) {
+                            updateCompletedUploads(prevState => prevState + 1);
+                        }
                     }
-                }
-              })              
-            })
-            
+                })           
+            })                 
         }
       }
     }, [inputFiles, imgOptions])
@@ -127,7 +138,7 @@ const Uploader = () => {
             {!(completedUploads === inputFiles.length && completedUploads !== 0) && !uploading && <Button colorScheme={'whatsapp'} onClick={uploadImages} mt={'15px'}>Upload</Button>}
 
             {uploading && <Flex w={'100%'} flexDir={'column'} alignItems={'center'} mt={'10vh'}>
-                <Spinner/>
+                <Spinner mb={'10px'}/>
                 <Flex w={'100%'} flexDir={'column'}>
                     <Box w={`${100 * (completedUploads / inputFiles.length)}%`} transition={'width 0.5s ease-out'} h={'10px'} marginTop={'10px'} bgColor={'#0AA653'}/>
                     <Text>{completedUploads}/{inputFiles.length}</Text>

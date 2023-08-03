@@ -3,9 +3,11 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
 import { Image as ImageSchema, Tag as TagSchema } from '@prisma/client'
-import { SimpleGrid, Flex, Text, Link, Divider, Tag, HStack } from '@chakra-ui/react'
+import { SimpleGrid, Flex, Text, Link, Divider, Tag } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
+import convertImage from '../experimental/convertImage'
+import toBase64 from '../experimental/toBase64'
 
 interface ImageSchemaWithTags extends ImageSchema {
   tags?: TagSchema[]
@@ -32,6 +34,10 @@ const Home: NextPage<Props> = ({ images }) => {
   const updateImages = useCallback(() => {
     axios.post('/api/list', {page: page})
     .then((res) => {
+      if (Object.keys(res.data).length === 0) {
+        setLastHeight(Infinity)
+        return
+      }
 
       let combined = Object.assign({}, data);
 
@@ -86,17 +92,16 @@ const Home: NextPage<Props> = ({ images }) => {
             <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
             <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
             <SimpleGrid columns={[2,3,4]}>
-              {data[date].map((image) => (
-                <Flex key={image.id} m={'4px'} flexDir={'column'}>
-                  <Image style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} loading={'eager'} key={image.url} alt={'snapshot of nature :)'} src={image.url}/>                  
-                  
-                  <HStack flexWrap={'wrap'} mt={'10px'}>
-                  {image.tags?.map((tag) => (
-                    <Tag key={tag.name} size={'sm'} fontSize={['10px', '11px', '12px']} maxW={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
+              {data[date].map((image) => (               
+                <Flex key={image.url} m={'4px'} flexDir={'column'}>                  
+                  <Image blurDataURL={`data:image/svg+xml;base64,${toBase64(convertImage(700, 475))}`} placeholder='blur' style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} loading={'eager'} priority={true} alt={'snapshot of nature :)'} src={image.url}/>                                  
+                  <SimpleGrid columns={[3]} spacing={1} mt={'10px'}>
+                  {image.tags?.map((tag, i) => (
+                    <Tag key={i} size={'sm'} fontSize={['10px', '11px', '12px']} w={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
                   ))
                   }           
-                  </HStack>       
-                </Flex>
+                  </SimpleGrid>       
+                </Flex>                            
               ))}
             </SimpleGrid>
           </Flex>

@@ -16,7 +16,6 @@
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@prisma/client": "^4.14.1",
-    "aws-sdk": "^2.1376.0",
     "axios": "^1.4.0",
     "chakra-react-select": "^4.7.0",
     "framer-motion": "^10.12.10",

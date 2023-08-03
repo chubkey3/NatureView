@@ -13,7 +13,7 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
 
-  let take = 20;
+  let take = 10;
     
   let data = await prisma.image.findMany({
     orderBy: {
