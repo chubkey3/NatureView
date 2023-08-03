@@ -19,8 +19,8 @@ interface ImageOptions {
 }
 
 const s3 = new S3Client({
-    endpoint: 'https://sfo3.digitaloceanspaces.com',
-    region: 'us-west-3',    
+    endpoint: 'https://' + process.env.BUCKET_ENDPOINT,
+    region: process.env.BUCKET_REGION,    
     credentials: {
         accessKeyId: process.env.ACCESS_KEY_ID || "",
         secretAccessKey: process.env.ACCESS_SECRET_KEY || ""

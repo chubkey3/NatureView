@@ -92,9 +92,9 @@ const Home: NextPage<Props> = ({ images }) => {
             <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
             <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
             <SimpleGrid columns={[2,3,4]}>
-              {data[date].map((image) => (               
-                <Flex key={image.url} m={'4px'} flexDir={'column'}>                  
-                  <Image blurDataURL={`data:image/svg+xml;base64,${toBase64(convertImage(700, 475))}`} placeholder='blur' style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} loading={'eager'} priority={true} alt={'snapshot of nature :)'} src={image.url}/>                                  
+              {data[date].map((image, i) => (               
+                <Flex key={i} m={'4px'} flexDir={'column'}>                  
+                  <Image blurDataURL={`data:image/svg+xml;base64,${toBase64(convertImage(700, 475))}`} placeholder='blur' style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} alt={'snapshot of nature :)'} src={image.url}/>                                  
                   <SimpleGrid columns={[3]} spacing={1} mt={'10px'}>
                   {image.tags?.map((tag, i) => (
                     <Tag key={i} size={'sm'} fontSize={['10px', '11px', '12px']} w={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
