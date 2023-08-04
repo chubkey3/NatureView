@@ -7,6 +7,7 @@ const nextConfig = {
     ACCESS_SECRET_KEY: process.env.ACCESS_SECRET_KEY,
     BUCKET_NAME: process.env.BUCKET_NAME,
     BUCKET_ENDPOINT: process.env.BUCKET_ENDPOINT,
+    BUCKET_CDN_ENDPOINT: process.env.BUCKET_CDN_ENDPOINT,
     BUCKET_REGION: process.env.BUCKET_REGION,
     DATABASE_URL: process.env.DATABASE_URL
   },
@@ -14,7 +15,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: process.env.BUCKET_NAME + '.' + process.env.BUCKET_ENDPOINT,
+        hostname: process.env.BUCKET_NAME + '.' + process.env.BUCKET_CDN_ENDPOINT,
         port: '',
         pathname: '/images/**'
       }

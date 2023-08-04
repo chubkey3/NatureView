@@ -20,7 +20,7 @@ export default async function handler(
     if (found) {
         
         let params: DeleteObjectCommandInput = {
-            Bucket: 'nature-images',
+            Bucket: process.env.BUCKET_NAME,
             Key: 'images/' + filename,                          
         }   
                     

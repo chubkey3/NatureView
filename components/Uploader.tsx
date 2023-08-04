@@ -40,7 +40,7 @@ const Uploader = () => {
             for (let i = 0; i<inputFiles.length; i++) {
                 let params = {
                 Body: inputFiles[i],
-                Bucket: 'nature-images',
+                Bucket: process.env.BUCKET_NAME,
                 Key: 'images/' + nanoid() + '.' + inputFiles[i].name.split('.').pop(),          
                 ACL: 'public-read'       
             }
@@ -50,7 +50,7 @@ const Uploader = () => {
             s3.send(command)
             .then(() => {
                 if (!params.Key) return
-                let url = `https://${process.env.BUCKET_NAME}.${process.env.BUCKET_ENDPOINT}/${params.Key}`
+                let url = `https://${process.env.BUCKET_NAME}.${process.env.BUCKET_CDN_ENDPOINT}/${params.Key}`
                 let id = params.Key.split('/').pop()?.split('.')[0]
                 
                 axios.post('/api/upload', {...{id: id, url: url, lastModified: inputFiles[i].lastModified}, ...{...imgOptions[inputFiles[i].name]}}, {
