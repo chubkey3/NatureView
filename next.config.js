@@ -22,6 +22,8 @@ const nextConfig = {
   }
 }
 
+/*
+will implement later
 if (process.env.NODE_ENV === "production"){
   const withPWA = require("next-pwa");
 
@@ -37,3 +39,6 @@ if (process.env.NODE_ENV === "production"){
 } else {
   module.exports = nextConfig
 }
+*/
+
+module.exports = nextConfig

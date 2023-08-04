@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "docker": "docker run --rm -dp 127.0.0.1:3000:3000 natureview"
+    "docker": "docker run --rm -p 3000:3000 natureview"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.331.0",
