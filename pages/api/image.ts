@@ -10,6 +10,9 @@ export default async function handler(
     let image = await prisma.image.findUnique({
         where: {
             id: req.body.id
+        },
+        include: {
+            tags: true
         }
     })
 
