@@ -23,7 +23,9 @@ export default async function handler(
       tags: true
     },
     ...(req.body.page ? {take: take} : {}),
-    ...(req.body.page ? {skip: (req.body.page - 1) * take} : {})
+    ...(req.body.page ? {skip: (req.body.page - 1) * take} : {}),
+    ...(req.query.page ? {take: take} : {}),
+    ...(req.query.page ? {skip: (parseInt(req.query.page[0]) - 1) * take} : {})
   })  
 
   let test: Test = {}

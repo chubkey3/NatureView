@@ -2,6 +2,7 @@ import type { GetServerSideProps, NextPage } from 'next'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
+import useSWR from 'swr'
 import { Image as ImageSchema, Tag as TagSchema } from '@prisma/client'
 import { SimpleGrid, Flex, Text, Link, Divider, Tag, useToast } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
@@ -32,14 +33,8 @@ const Home: NextPage<Props> = ({ images }) => {
   const [data, setData] = useState<Data>(images);
   const [lastHeight, setLastHeight] = useState<number>(0)
 
-  const updateImages = useCallback(() => {
-    axios.post('/api/list', {page: page})
-    .then((res) => {
-      if (Object.keys(res.data).length === 0) {
-        setLastHeight(Infinity)
-        return
-      }
-
+  const fetcher = (url: string) => axios.post(url)
+    .then((res) => {      
       let combined = Object.assign({}, data);
 
       for (const date in res.data) {
@@ -48,13 +43,13 @@ const Home: NextPage<Props> = ({ images }) => {
         } else {
           combined[date] = combined[date].concat(res.data[date])
         }
-      }      
-      
+      }            
       setData(combined)
-
     })
-  }, [data, page])
-
+  
+  //experimental
+  useSWR((page !== 1) ? ('/api/list?page=' + page) : null, fetcher)
+  
   const onScroll = useCallback(() => {
     let height = (document.documentElement.scrollHeight - window.innerHeight) * 3/4;
    
@@ -78,13 +73,7 @@ const Home: NextPage<Props> = ({ images }) => {
     if (lastHeight){
       setPage(prevState => prevState + 1)    
     }
-  }, [lastHeight])
-
-  useEffect(() => {
-    if (page > 1) {
-      updateImages()
-    }
-  }, [page])
+  }, [lastHeight])  
 
   useEffect(() => {
     window.addEventListener('scroll', onScroll)
