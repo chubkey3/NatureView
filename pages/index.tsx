@@ -3,11 +3,12 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
 import { Image as ImageSchema, Tag as TagSchema } from '@prisma/client'
-import { SimpleGrid, Flex, Text, Link, Divider, Tag, useToast } from '@chakra-ui/react'
+import { SimpleGrid, Flex, Text, Link, Divider, Tag, useToast, Input, InputGroup, InputRightAddon, InputRightElement, Fade } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import convertImage from '../experimental/convertImage'
 import toBase64 from '../experimental/toBase64'
+import { AiOutlineSearch } from 'react-icons/ai'
 
 interface ImageSchemaWithTags extends ImageSchema {
   tags?: TagSchema[]
@@ -31,6 +32,7 @@ const Home: NextPage<Props> = ({ images }) => {
   const [page, setPage] = useState<number>(1);
   const [data, setData] = useState<Data>(images);
   const [lastHeight, setLastHeight] = useState<number>(0)
+  const [search, setSearch] = useState<string>("")
 
   const updateImages = useCallback(() => {
     axios.post('/api/list', {page: page})
@@ -95,23 +97,35 @@ const Home: NextPage<Props> = ({ images }) => {
 
   return (
     <div className={styles.container}>            
-      <main className={styles.main}>                  
+      <main className={styles.main}>     
+        <Flex pos={['relative', 'relative', 'absolute']} top={['initial', 'initial', 0]} right={['initial', 'initial', 0]} mr={['initial', 'initial', '50px']} mt={['initial', 'initial', '30px']}>
+          <InputGroup size={['sm', 'md', 'lg']}>
+            <Input borderColor={'gray.300'} value={search} onChange={(e) => setSearch(e.target.value)}/>
+            <InputRightAddon bgColor={'green.500'} color={'white'}>
+              <AiOutlineSearch fontSize={'20px'}/>        
+            </InputRightAddon>
+          </InputGroup>       
+        </Flex>
         {(Object.keys(data).length > 0) ?
         (Object.keys(data).map((date) => (
+          data[date].filter((a) => a.tags?.find((b) => b.name.includes(search))).length > 0 &&
           <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
             <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
             <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
             <SimpleGrid columns={[2,3,4]}>
               {data[date].map((image, i) => (               
-                <Flex key={i} m={'4px'} flexDir={'column'} cursor={'pointer'} onClick={() => router.push('/image/' + image.id)} _hover={{opacity: 0.8}} transition={'opacity 0.25s ease-out'}>                  
-                  <Image blurDataURL={`data:image/svg+xml;base64,${toBase64(convertImage(700, 475))}`} placeholder='blur' style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} alt={'snapshot of nature :)'} src={image.url}/>                                  
-                  <SimpleGrid columns={[3]} spacing={1} mt={'10px'}>
-                  {image.tags?.map((tag, i) => (
-                    <Tag key={i} size={'sm'} fontSize={['10px', '11px', '12px']} w={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
-                  ))
-                  }           
-                  </SimpleGrid>       
-                </Flex>                            
+                image.tags !== undefined && (image.tags.find((a) => a.name.includes(search)) || search === "") && 
+                  <Flex key={i} m={'4px'} flexDir={'column'} cursor={'pointer'} onClick={() => router.push('/image/' + image.id)} _hover={{opacity: 0.8}} transition={'opacity 0.25s ease-out'}>                  
+                    <Fade in={true} style={{width: '100%', height: '100%'}}>
+                      <Image blurDataURL={`data:image/svg+xml;base64,${toBase64(convertImage(700, 475))}`} placeholder='blur' style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} alt={'snapshot of nature :)'} src={image.url}/>                                  
+                      <SimpleGrid columns={[3]} spacing={1} mt={'10px'}>
+                      {image.tags?.map((tag, i) => (
+                        <Tag key={i} size={'sm'} fontSize={['10px', '11px', '12px']} w={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
+                      ))
+                      }           
+                      </SimpleGrid>       
+                    </Fade>
+                  </Flex>                                                
               ))}
             </SimpleGrid>
           </Flex>

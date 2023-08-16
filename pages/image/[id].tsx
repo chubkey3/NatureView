@@ -94,7 +94,7 @@ const ImagePage: NextPage<Props> = ({image}) => {
         .then(() => router.reload())
         .catch(() => toast({title: 'Error!', description: 'An error encountered editing the image!', status: 'error', duration: 3000}))
 
-    }, [image, router, toast, data])
+    }, [router, toast, data])
 
     return (
         <Flex justifyContent={'center'} alignItems={'center'} flexDir={'column'}>            
