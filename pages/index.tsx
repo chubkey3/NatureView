@@ -108,7 +108,7 @@ const Home: NextPage<Props> = ({ images }) => {
         </Flex>
         {(Object.keys(data).length > 0) ?
         (Object.keys(data).map((date) => (
-          data[date].filter((a) => a.tags?.find((b) => b.name.includes(search))).length > 0 &&
+          (data[date].filter((a) => a.tags?.find((b) => b.name.includes(search))).length > 0 || search === "") &&
           <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
             <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
             <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
