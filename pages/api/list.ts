@@ -2,11 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../lib/prisma'
 import { Image } from '@prisma/client'
 
-interface Test {
+interface GroupByDate {
   [key: string]: Image[]
 }
 
-type Data = Image[] | {message: string} | Test
+type Data = Image[] | {message: string} | GroupByDate
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,29 +26,43 @@ export default async function handler(
     ...(req.body.page ? {skip: (req.body.page - 1) * take} : {})
   })  
 
-  let test: Test = {}
+  
+  if (req.body.date) {         
+    data = data.filter((entry) => entry.lastModified.getMonth() + 1 === parseInt(req.body.date.month) && entry.lastModified.getFullYear() === parseInt(req.body.date.year))
+  }
 
-  //parse data and group by month
-  if (data) {
-    for (const image of data) {
-      //let date = image.lastModified.toDateString().substring(image.lastModified.toDateString().indexOf(' ') + 1) //day
-      let date = image.lastModified.toDateString().split(' ').filter((e, i) => i !== 0 && i !== 2).join(' ') //month
-
-      if (!Object.hasOwn(test, date)) {
-        test[date] = [image]
-      } else {
-        test[date].push(image)
-      }
-    }
-
-    //console.log(test)
-    res.status(200).json(test)
-  } else {
-    res.status(500).json({message: "Internal Server Error!"})
+  if (req.body.includeTags) {
+    data = data.filter((entry) => entry.tags.filter(value => req.body.includeTags.includes(value.name)).length > 0)
   }
   
-  
+  if (req.body.raw) {
 
+    if (data) {
+      res.status(200).json(data)
+    } else {
+      res.status(500).json({message: "Internal Server Error!"})
+    }
+
+  } else {
+
+    let dataByDate: GroupByDate = {}
+
+    if (data) {
+      for (const image of data) {      
+        let date = image.lastModified.toDateString().split(' ').filter((_e, i) => i !== 0 && i !== 2).join(' ')
+
+        if (!Object.hasOwn(dataByDate, date)) {
+          dataByDate[date] = [image]
+        } else {
+          dataByDate[date].push(image)
+        }
+      }
+
+      res.status(200).json(dataByDate)
+    } else {
+      res.status(500).json({message: "Internal Server Error!"})
+    }
+  }
 }
 
 
