@@ -11,6 +11,7 @@ import { BiTime } from 'react-icons/bi'
 import { useCallback, useState } from "react"
 import { HiOutlineTrash } from 'react-icons/hi'
 import { ChakraStylesConfig, Select } from "chakra-react-select"
+import chakraStyles from "../../util/ChakraStyles"
 
 interface ImageSchemaWithTags extends ImageSchema {
     tags: TagSchema[]
@@ -29,47 +30,6 @@ const ImagePage: NextPage<Props> = ({image, tags}) => {
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [data, setData] = useState<ImageSchemaWithTags>(image)
     const [input, setInput] = useState<string>("")    
-
-    const chakraStyles: ChakraStylesConfig = {
-        menu: (provided) => ({
-            ...provided,
-            maxH: '120px',
-            overflowY: 'auto',                 
-                             
-        }),
-        clearIndicator: (provided) => ({
-            ...provided,
-            display: 'none'
-                    
-        }),
-        placeholder: (provided) => ({
-            ...provided,
-            color: 'rgba(39, 103, 73, 0.7)',
-        }),
-        container: (provided) => ({
-            ...provided,
-            borderColor: 'rgba(30, 130, 0, 0.5)'                      
-        }),
-        indicatorsContainer: (provided) => ({
-            ...provided,
-            maxWidth: '30px',     
-            backgroundColor: 'green.300'                   
-        }),
-        downChevron: (provided) => ({
-            ...provided,
-            color: 'green.800'
-        }),
-        multiValueRemove: (provided) => ({
-            ...provided,                       
-            fontSize: 'md',
-            width: '10px',
-            height: '10px',            
-        }),
-        multiValueLabel: (provided) => ({
-            ...provided,
-            fontSize: 'xs',                 
-        })        
-    }    
 
     const removeImage = useCallback(() => {
 
