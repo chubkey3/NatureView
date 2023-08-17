@@ -156,7 +156,7 @@ const Home: NextPage<Props> = ({ images }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
-    const res = await axios.post((process.env.NODE_ENV === 'production') ? 'https://natureview3.vercel.app/api/list' : 'http://localhost:3000/api/list', {page: 1})
+    const res = await axios.post(process.env.HOST ? `${process.env.HOST}/api/list` : 'http://localhost:3000/api/list', {page: 1})
     const images = res.data
 
     return {

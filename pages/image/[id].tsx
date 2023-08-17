@@ -8,7 +8,7 @@ import { BsFillPersonFill } from "react-icons/bs"
 import { FiEdit } from 'react-icons/fi'
 import { IoMdArrowRoundBack } from 'react-icons/io'
 import { BiTime } from 'react-icons/bi'
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 import { HiOutlineTrash } from 'react-icons/hi'
 import { ChakraStylesConfig, Select } from "chakra-react-select"
 
@@ -17,18 +17,18 @@ interface ImageSchemaWithTags extends ImageSchema {
 }
 
 type Props = {
-    image: ImageSchemaWithTags
+    image: ImageSchemaWithTags,
+    tags: TagSchema[]
 }
 
-const ImagePage: NextPage<Props> = ({image}) => {
+const ImagePage: NextPage<Props> = ({image, tags}) => {
     const router = useRouter()
     const toast = useToast()
 
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
     const [isEditing, setIsEditing] = useState<boolean>(false)
     const [data, setData] = useState<ImageSchemaWithTags>(image)
-    const [input, setInput] = useState<string>("")
-    const [tags, setTags] = useState<TagSchema[]>()
+    const [input, setInput] = useState<string>("")    
 
     const chakraStyles: ChakraStylesConfig = {
         menu: (provided) => ({
@@ -69,12 +69,7 @@ const ImagePage: NextPage<Props> = ({image}) => {
             ...provided,
             fontSize: 'xs',                 
         })        
-    }
-
-    useEffect(() => {
-        axios.get('/api/tags')
-        .then((res) => setTags(res.data))
-    }, [])
+    }    
 
     const removeImage = useCallback(() => {
 
@@ -151,12 +146,15 @@ const ImagePage: NextPage<Props> = ({image}) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
     try {
-      const res = await axios.post((process.env.NODE_ENV === 'production') ? 'https://natureview3.vercel.app/api/image' : 'http://localhost:3000/api/image', {id: ctx.params ? ctx.params.id : ""})
-      const image = res.data
+      const image_res = await axios.post(process.env.HOST ? `${process.env.HOST}/api/image` : 'http://localhost:3000/api/image', {id: ctx.params ? ctx.params.id : ""})
+      const tags_res = await axios.get(process.env.HOST ? `${process.env.HOST}/api/tags` : 'http://localhost:3000/api/tags')
+      const image = image_res.data
+      const tags = tags_res.data
   
       return {
         props: {
-          image
+          image,
+          tags
         }
       }
       
