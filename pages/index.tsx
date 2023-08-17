@@ -3,12 +3,13 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
 import { Image as ImageSchema, Tag as TagSchema } from '@prisma/client'
-import { SimpleGrid, Flex, Text, Link, Divider, Tag, useToast, Input, InputGroup, InputRightAddon, InputRightElement, Fade } from '@chakra-ui/react'
+import { SimpleGrid, Flex, Text, Link, Divider, Tag, useToast, Input, InputGroup, InputRightAddon, Fade, Wrap, WrapItem, useMediaQuery, IconButton, useDisclosure, Button, AlertDialog, AlertDialogContent, AlertDialogCloseButton, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, AlertDialogOverlay } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import convertImage from '../experimental/convertImage'
 import toBase64 from '../experimental/toBase64'
 import { AiOutlineSearch } from 'react-icons/ai'
+import { IoFilter } from 'react-icons/io5'
 
 interface ImageSchemaWithTags extends ImageSchema {
   tags?: TagSchema[]
@@ -22,6 +23,11 @@ type Props = {
   images: Data  
 }
 
+type Date = {
+  month: string,
+  year: string
+}
+
 let quality = 430;
 
 const Home: NextPage<Props> = ({ images }) => {
@@ -33,6 +39,11 @@ const Home: NextPage<Props> = ({ images }) => {
   const [data, setData] = useState<Data>(images);
   const [lastHeight, setLastHeight] = useState<number>(0)
   const [search, setSearch] = useState<string>("")
+  const [dateQuery, setDateQuery] = useState<Date>()
+
+  const isMobile = useMediaQuery('(min-width: 1000px)', {ssr: true, fallback: false})
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const cancelRef = useRef(null)
 
   const updateImages = useCallback(() => {
     axios.post('/api/list', {page: page})
@@ -97,33 +108,40 @@ const Home: NextPage<Props> = ({ images }) => {
 
   return (
     <div className={styles.container}>            
-      <main className={styles.main}>     
+      <main className={styles.main}>             
+        {isMobile[0] ? 
         <Flex pos={['relative', 'relative', 'absolute']} top={['initial', 'initial', 0]} right={['initial', 'initial', 0]} mr={['initial', 'initial', '50px']} mt={['initial', 'initial', '30px']}>
-          <InputGroup size={['sm', 'md', 'lg']}>
-            <Input borderColor={'gray.300'} value={search} onChange={(e) => setSearch(e.target.value)}/>
-            <InputRightAddon bgColor={'green.500'} color={'white'}>
-              <AiOutlineSearch fontSize={'20px'}/>        
-            </InputRightAddon>
-          </InputGroup>       
-        </Flex>
+         <Input value={dateQuery && dateQuery.month ? `${dateQuery.year}-${dateQuery?.month.length === 1 ? '0' + dateQuery.month : dateQuery.month}` : undefined} type={'month'} size={['sm', 'md', 'lg']} mr={'30px'} onChange={(e) => setDateQuery({month: e.target.value.split('-')[1], year: e.target.value.split('-')[0]})}/>
+         <InputGroup size={['sm', 'md', 'lg']}>
+           <Input borderColor={'gray.300'} value={search} onChange={(e) => setSearch(e.target.value)}/>
+           <InputRightAddon bgColor={'green.500'} color={'white'}>
+             <AiOutlineSearch fontSize={'20px'}/>        
+           </InputRightAddon>
+         </InputGroup>       
+       </Flex>
+        :               
+        <IconButton as={IoFilter} aria-label="filter" p={1} colorScheme={'green'} pos={'absolute'} top={0} right={0} mr={['20px', '30px', '40px']} mt={'28px'} onClick={onOpen}/>
+        }
         {(Object.keys(data).length > 0) ?
         (Object.keys(data).map((date) => (
-          (data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0 || search === "") &&
+          (data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0 || search === "" || isOpen) && (isOpen || dateQuery === undefined || dateQuery.month === undefined || data[date].filter((a) => new Date(a.lastModified).getMonth() + 1 === parseInt(dateQuery.month) && new Date(a.lastModified).getFullYear() === parseInt(dateQuery.year)).length > 0) &&
           <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
             <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
             <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
             <SimpleGrid columns={[2,3,4]}>
               {data[date].map((image, i) => (               
-                image.tags !== undefined && (image.tags.find((a) => a.name.toLowerCase().includes(search.toLowerCase())) || search === "") && 
+                image.tags !== undefined && (image.tags.find((a) => a.name.toLowerCase().includes(search.toLowerCase())) || search === "" || isOpen) && 
                   <Flex key={i} m={'4px'} flexDir={'column'} cursor={'pointer'} onClick={() => router.push('/image/' + image.id)} _hover={{opacity: 0.8}} transition={'opacity 0.25s ease-out'}>                  
                     <Fade in={true} style={{width: '100%', height: '100%'}}>
                       <Image blurDataURL={`data:image/svg+xml;base64,${toBase64(convertImage(700, 475))}`} placeholder='blur' style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} alt={'snapshot of nature :)'} src={image.url}/>                                  
-                      <SimpleGrid columns={[3]} spacing={1} mt={'10px'}>
+                      <Wrap spacing={1} mt={'10px'}>
                       {image.tags?.map((tag, i) => (
-                        <Tag key={i} size={'sm'} fontSize={['10px', '11px', '12px']} w={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
+                        <WrapItem key={i}>
+                          <Tag size={'sm'} fontSize={['10px', '11px', '12px']} colorScheme={tag.color}>{tag.name}</Tag>
+                        </WrapItem>
                       ))
                       }           
-                      </SimpleGrid>       
+                      </Wrap>       
                     </Fade>
                   </Flex>                                                
               ))}
@@ -139,6 +157,35 @@ const Home: NextPage<Props> = ({ images }) => {
           <Text mt={5} fontSize={'md'}>Click <Link onClick={() => router.push('/upload')} color={'green.500'} textDecor={'underline'}>Here</Link> to start a beautiful collection of nature images!</Text>
         </Flex>
         }
+        <AlertDialog isOpen={isOpen} onClose={() => {setSearch(""); setDateQuery(undefined); onClose()}} leastDestructiveRef={cancelRef}>
+          <AlertDialogOverlay>
+            <AlertDialogContent w={'80%'}>
+              <AlertDialogCloseButton/>
+              <AlertDialogHeader>Filter</AlertDialogHeader>
+
+              <AlertDialogBody>
+                <Flex flexDir={'column'}>
+                  <InputGroup size={['sm', 'md', 'lg']}>
+                    <Input borderColor={'gray.300'} value={search} onChange={(e) => setSearch(e.target.value)}/>
+                    <InputRightAddon bgColor={'green.500'} color={'white'}>
+                      <AiOutlineSearch fontSize={'20px'}/>        
+                    </InputRightAddon>
+                  </InputGroup>  
+                  <Input value={dateQuery && dateQuery.month ? `${dateQuery.year}-${dateQuery?.month.length === 1 ? '0' + dateQuery.month : dateQuery.month}` : undefined} mt={'20px'} type={'month'} size={['sm', 'md', 'lg']} mr={'30px'} onChange={(e) => setDateQuery({month: e.target.value.split('-')[1], year: e.target.value.split('-')[0]})}/>     
+                </Flex>
+              </AlertDialogBody>
+
+              <AlertDialogFooter justifyContent={'space-around'}>
+                <Button ref={cancelRef} colorScheme={'red'} onClick={() => {setSearch(""); setDateQuery(undefined); onClose()}}>
+                  Clear
+                </Button>
+                <Button onClick={onClose} colorScheme={'green'}>
+                  Search
+                </Button>            
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
       </main>  
     </div>
   )
