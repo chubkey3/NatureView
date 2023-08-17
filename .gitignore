@@ -3,6 +3,9 @@
 #env
 .env
 
+#docker
+*.tar
+
 # pwa
 **/public/sw.js
 **/public/workbox-*.js
