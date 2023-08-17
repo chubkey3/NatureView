@@ -108,13 +108,13 @@ const Home: NextPage<Props> = ({ images }) => {
         </Flex>
         {(Object.keys(data).length > 0) ?
         (Object.keys(data).map((date) => (
-          (data[date].filter((a) => a.tags?.find((b) => b.name.includes(search))).length > 0 || search === "") &&
+          (data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0 || search === "") &&
           <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
             <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
             <Divider borderColor={'green.800'} w={'25%'} mb={'20px'} mt={'5px'}/>
             <SimpleGrid columns={[2,3,4]}>
               {data[date].map((image, i) => (               
-                image.tags !== undefined && (image.tags.find((a) => a.name.includes(search)) || search === "") && 
+                image.tags !== undefined && (image.tags.find((a) => a.name.toLowerCase().includes(search.toLowerCase())) || search === "") && 
                   <Flex key={i} m={'4px'} flexDir={'column'} cursor={'pointer'} onClick={() => router.push('/image/' + image.id)} _hover={{opacity: 0.8}} transition={'opacity 0.25s ease-out'}>                  
                     <Fade in={true} style={{width: '100%', height: '100%'}}>
                       <Image blurDataURL={`data:image/svg+xml;base64,${toBase64(convertImage(700, 475))}`} placeholder='blur' style={{objectFit: 'cover', height: '80%'}} sizes={'(max-width: 300px) 45vw, (max-width: 500px) 30vw, 22.5vw'} width={quality} height={0} priority={true} alt={'snapshot of nature :)'} src={image.url}/>                                  
