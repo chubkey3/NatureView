@@ -9,7 +9,8 @@ const nextConfig = {
     BUCKET_ENDPOINT: process.env.BUCKET_ENDPOINT,
     BUCKET_CDN_ENDPOINT: process.env.BUCKET_CDN_ENDPOINT,
     BUCKET_REGION: process.env.BUCKET_REGION,
-    DATABASE_URL: process.env.DATABASE_URL
+    DATABASE_URL: process.env.DATABASE_URL,
+    HOST: process.env.HOST
   },
   images: {
     remotePatterns: [
