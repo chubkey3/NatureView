@@ -122,7 +122,7 @@ const Home: NextPage<Props> = ({ images }) => {
         :               
         <IconButton as={IoFilter} aria-label="filter" p={1} colorScheme={'green'} pos={'absolute'} top={0} right={0} mr={['20px', '30px', '40px']} mt={'28px'} onClick={onOpen}/>
         }
-        {(Object.keys(data).length > 0) ?
+        {(Object.keys(data).length > 0 && (Object.keys(data).filter(date => data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0).length > 0) && (dateQuery === undefined || Object.keys(data).filter(date => data[date].filter((a) => new Date(a.lastModified).getMonth() + 1 === parseInt(dateQuery.month) && new Date(a.lastModified).getFullYear() === parseInt(dateQuery.year)).length > 0).length > 0)) ?
         (Object.keys(data).map((date) => (
           (data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0 || search === "" || isOpen) && (isOpen || dateQuery === undefined || dateQuery.month === undefined || data[date].filter((a) => new Date(a.lastModified).getMonth() + 1 === parseInt(dateQuery.month) && new Date(a.lastModified).getFullYear() === parseInt(dateQuery.year)).length > 0) &&
           <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
@@ -154,7 +154,7 @@ const Home: NextPage<Props> = ({ images }) => {
           <Text fontSize={'xl'} fontWeight={'bold'}>
               No Images Found!
           </Text>
-          <Text mt={5} fontSize={'md'}>Click <Link onClick={() => router.push('/upload')} color={'green.500'} textDecor={'underline'}>Here</Link> to start a beautiful collection of nature images!</Text>
+          <Text mt={5} fontSize={'md'}>Click <Link onClick={() => router.push('/upload')} color={'green.500'} textDecor={'underline'}>Here</Link> to add images of nature!</Text>
         </Flex>
         }
         <AlertDialog isOpen={isOpen} onClose={() => {setSearch(""); setDateQuery(undefined); onClose()}} leastDestructiveRef={cancelRef}>
