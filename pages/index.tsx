@@ -37,7 +37,7 @@ const Home: NextPage<Props> = ({ images }) => {
 
   const [page, setPage] = useState<number>(1);
   const [data, setData] = useState<Data>(images);
-  const [lastHeight, setLastHeight] = useState<number>(0)
+  const [lastHeight, setLastHeight] = useState<number>(-1)
   const [search, setSearch] = useState<string>("")
   const [dateQuery, setDateQuery] = useState<Date>()
 
@@ -69,13 +69,13 @@ const Home: NextPage<Props> = ({ images }) => {
   }, [data, page])
 
   const onScroll = useCallback(() => {
-    let height = (document.documentElement.scrollHeight - window.innerHeight) * 3/4;
-   
-    if (window.scrollY >= height) {
-      if (height > lastHeight){
+    let height = Math.max((document.documentElement.scrollHeight - window.innerHeight) - 500, 0);
+    
+    if (window.scrollY >= height) {            
+      if (height > lastHeight){                
         setLastHeight(height)
       }
-    }
+    }    
   }, [lastHeight])
 
   useEffect(() => {
@@ -122,7 +122,7 @@ const Home: NextPage<Props> = ({ images }) => {
         :               
         <IconButton as={IoFilter} aria-label="filter" p={1} colorScheme={'green'} pos={'absolute'} top={0} right={0} mr={['20px', '30px', '40px']} mt={'28px'} onClick={onOpen}/>
         }
-        {(Object.keys(data).length > 0 && (Object.keys(data).filter(date => data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0).length > 0) && (dateQuery === undefined || Object.keys(data).filter(date => data[date].filter((a) => new Date(a.lastModified).getMonth() + 1 === parseInt(dateQuery.month) && new Date(a.lastModified).getFullYear() === parseInt(dateQuery.year)).length > 0).length > 0)) ?
+        {(Object.keys(data).length > 0 && (Object.keys(data).filter(date => data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0).length > 0 || search === "") && (dateQuery === undefined || Object.keys(data).filter(date => data[date].filter((a) => new Date(a.lastModified).getMonth() + 1 === parseInt(dateQuery.month) && new Date(a.lastModified).getFullYear() === parseInt(dateQuery.year)).length > 0).length > 0)) ?
         (Object.keys(data).map((date) => (
           (data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0 || search === "" || isOpen) && (isOpen || dateQuery === undefined || dateQuery.month === undefined || data[date].filter((a) => new Date(a.lastModified).getMonth() + 1 === parseInt(dateQuery.month) && new Date(a.lastModified).getFullYear() === parseInt(dateQuery.year)).length > 0) &&
           <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
