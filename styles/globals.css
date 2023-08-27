@@ -3,8 +3,7 @@ body {
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  scrollbar-gutter: stable both-edges;
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;  
 }
 
 a {
@@ -14,6 +13,7 @@ a {
 
 * {
   box-sizing: border-box;
+  scrollbar-gutter: stable;
 }
 
 @media (prefers-color-scheme: dark) {
