@@ -10,6 +10,7 @@ import convertImage from '../experimental/convertImage'
 import toBase64 from '../experimental/toBase64'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { IoFilter } from 'react-icons/io5'
+import InfiniteScroll from 'react-infinite-scroll-component'
 
 interface ImageSchemaWithTags extends ImageSchema {
   tags?: TagSchema[]
@@ -40,6 +41,7 @@ const Home: NextPage<Props> = ({ images }) => {
   const [lastHeight, setLastHeight] = useState<number>(-1)
   const [search, setSearch] = useState<string>("")
   const [dateQuery, setDateQuery] = useState<Date>()
+  const [hasMore, setHasMore] = useState<boolean>(true)
 
   const isMobile = useMediaQuery('(min-width: 1000px)', {ssr: true, fallback: false})
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -49,7 +51,8 @@ const Home: NextPage<Props> = ({ images }) => {
     axios.post('/api/list', {page: page})
     .then((res) => {
       if (Object.keys(res.data).length === 0) {
-        setLastHeight(Infinity)
+        //setLastHeight(Infinity)
+        setHasMore(false)
         return
       }
 
@@ -99,12 +102,13 @@ const Home: NextPage<Props> = ({ images }) => {
     }
   }, [page])
 
+  /*
   useEffect(() => {
     window.addEventListener('scroll', onScroll)
 
     return () => window.removeEventListener('scroll', onScroll)
   }, [onScroll])
-
+  */
 
   return (
     <div className={styles.container}>            
@@ -121,9 +125,10 @@ const Home: NextPage<Props> = ({ images }) => {
        </Flex>
         :               
         <IconButton as={IoFilter} aria-label="filter" p={1} colorScheme={'green'} pos={'absolute'} top={0} right={0} mr={['20px', '30px', '40px']} mt={'28px'} onClick={onOpen}/>
-        }
+        }        
         {(Object.keys(data).length > 0 && (Object.keys(data).filter(date => data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0).length > 0 || search === "") && (dateQuery === undefined || Object.keys(data).filter(date => data[date].filter((a) => new Date(a.lastModified).getMonth() + 1 === parseInt(dateQuery.month) && new Date(a.lastModified).getFullYear() === parseInt(dateQuery.year)).length > 0).length > 0)) ?
-        (Object.keys(data).map((date) => (
+        
+        (<InfiniteScroll dataLength={Object.keys(data).map(date => data[date].length).reduce((a, b) => a + b, 0)} next={() => setPage(prevState => prevState + 1)} hasMore={hasMore} loader={<h1>Loading...</h1>}>{Object.keys(data).map((date) => (
           (data[date].filter((a) => a.tags?.find((b) => b.name.toLowerCase().includes(search.toLowerCase()))).length > 0 || search === "" || isOpen) && (isOpen || dateQuery === undefined || dateQuery.month === undefined || data[date].filter((a) => new Date(a.lastModified).getMonth() + 1 === parseInt(dateQuery.month) && new Date(a.lastModified).getFullYear() === parseInt(dateQuery.year)).length > 0) &&
           <Flex mt={'6vh'} w={'90vw'} flexDir={'column'} key={date}>
             <Text ml={'4px'} fontSize={'xl'} fontWeight={'bold'} color={'green.800'}>{date}</Text>
@@ -147,7 +152,7 @@ const Home: NextPage<Props> = ({ images }) => {
               ))}
             </SimpleGrid>
           </Flex>
-        ))
+        ))}</InfiniteScroll>
         )
         :
         <Flex flexDir={'column'} textAlign={'center'} alignItems={'center'} maxW={'80vw'}>
