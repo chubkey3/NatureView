@@ -56,20 +56,22 @@ const ImagePage: NextPage<Props> = ({image, tags}) => {
             {/*<Flex w={'60%'} minW={'300px'}>
                 <IconButton aria-label="back buttton" as={IoMdArrowRoundBack} colorScheme="green" ml={1} size={'xs'} onClick={() => router.push('/')}/>                
     </Flex>*/}
-            <Card w={'60%'} mt={['10px', '20px']} display={'flex'}  minW={'300px'} mb={'100px'}>        
-                <Flex alignSelf={['initial', 'end']} justifyContent={'space-between'} mb={2} mt={1}>
+            <Card w={'60%'} mt={['10px', '20px']} display={'flex'} minW={'300px'} maxH={!isEditing ? 'calc(100vh - 200px)' : ''} mb={isEditing ? '100px' : ''}>        
+                <Flex alignSelf={['initial', 'end']} justifyContent={'space-between'} mb={1} mt={1}>
                     <IconButton size={'sm'} aria-label="edit image" m={2} as={FiEdit} colorScheme="blue" p={1} onClick={() => {setIsEditing(prevState => !prevState)}}/>        
                     <IconButton size={'sm'} aria-label="edit image" m={2} as={HiOutlineTrash} colorScheme="red" p={1} onClick={removeImage}/>                            
                 </Flex>
-                <Flex justifyContent={'center'}>
-                    <Flex flexDir={'column'} w={['80%', '60%']} pos={'relative'} alignItems={'center'} justifyContent={'center'} maxH={['40vh', '50vh']}>
+                <Flex justifyContent={'center'} flexDir={'column'} alignItems={'center'}>
+                    <Flex flexDir={'column'} pos={'relative'} alignItems={'center'} maxH={'45vh'} maxW={'90%'}>
                         {!isLoaded && <Spinner pos={'absolute'} my={'20px'} size={'xl'}/>}
                         {/*<Skeleton w={'100%'} h={'100%'} pos={'absolute'} isLoaded={isLoaded}/>*/}
-                        <Image onLoadingComplete={() => setIsLoaded(true)} style={{objectFit: 'contain', width: 'auto', height: '100%', borderRadius: '5px'}} src={image.url} priority={true} width={1000} height={0} alt="nature image :)"/>
-                        { 
-                            image.tags.length > 0 && !isEditing && <HStack pt={'10px'} pb={'20px'} flexWrap={'wrap'} spacing={2} mb={['10px', '20px']} display={'flex'}>
+                        <Image onLoadingComplete={() => setIsLoaded(true)} style={{objectFit: 'contain', width: 'auto', height: '100%', maxHeight: '45vh', borderRadius: '5px'}} src={image.url} priority={true} width={1000} height={0} alt="nature image :)"/>
+                        
+                    </Flex>       
+                    { 
+                            image.tags.length > 0 && !isEditing && isLoaded && <HStack mt={'5px'} flexWrap={'wrap'} spacing={2} display={'flex'}>
                                 {image.tags?.map((tag, i) => (
-                                    <Tag key={i} size={['xs', 'sm']} p={1} py={[0.5, 1]} fontSize={['8px', '11px', '13px']} w={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
+                                    <Tag key={i} size={['xs', 'sm']} p={1} py={[0.5, 1]} fontSize={['10px', '11px', '13px']} w={'fit-content'} colorScheme={tag.color}>{tag.name}</Tag>
                                     ))
                                 }    
                             </HStack>
@@ -77,14 +79,13 @@ const ImagePage: NextPage<Props> = ({image, tags}) => {
 
                         {                            
                             tags && isEditing &&  
-                            <Flex>
+                            <Flex mt={'5px'}>
                                 <Select colorScheme="green" chakraStyles={chakraStyles} useBasicStyles={true} variant="outline" focusBorderColor="#7bae37" placeholder="Add a tag" options={(input !== '' && tags.filter(a => a.name !== input).length === tags.length) ? tags.map((tag) => {return {label: tag.name, value: tag.name}}).concat({label: `Create tag: ${input}`, value: input}) : tags.map((tag) => {return {label: tag.name, value: tag.name}})} inputValue={input} onInputChange={setInput} onChange={(e) => setData({...data, tags: e.map((a: any) => tags.find((k) => k.name === a.label) || {name: a.label, color: '', icon: null})})} value={data.tags.map((tag) => {return {label: tag.name, value: tag.name}})} isMulti/>
                             </Flex>                             
-                        }   
-                    </Flex>                    
+                        }                
                 </Flex>
-                <CardBody   alignItems={'center'} w={'100%'} p={0} mt={'30px'} display={'flex'} fontSize={['sm', 'md']} flexDir={'column'}>                      
-                    {isLoaded && (isEditing ? <Textarea textAlign={'center'} fontSize={['xs', 'sm', 'md']} onChange={(e) => setData({...data, description: e.target.value})}>{image.description || "This image has no description."}</Textarea> : <Text fontSize={['xs', 'sm', 'md']} mt={'10px'}>{image.description || "This image has no description."}</Text>)}
+                <CardBody alignItems={'center'} justifyContent={'center'} w={'100%'} p={0} display={'flex'} fontSize={['sm', 'md']} flexDir={'column'} mb={'10px'} mt={'15px'} >                      
+                    {isLoaded && (isEditing ? <Textarea w={'80%'} textAlign={'center'} fontSize={['xs', 'sm', 'md']} onChange={(e) => setData({...data, description: e.target.value})}>{image.description || "This image has no description."}</Textarea> : <Text textAlign={'center'} fontSize={['xs', 'sm', 'md']} w={'80%'}>{image.description || "This image has no description."}</Text>)}
                 </CardBody>
                 <CardFooter p={['10px', '20px']} flexDir={'column'} alignItems={'center'}>
                     <Flex justifyContent={'space-between'} w={'100%'}>                        
@@ -97,7 +98,7 @@ const ImagePage: NextPage<Props> = ({image, tags}) => {
                             <Icon as={BsFillPersonFill} ml={1} fontSize={'20px'}/>
                         </Flex>
                     </Flex>
-                    {isEditing && <Button isDisabled={data === image ? true : false} size={['sm', 'md']} mt={'10px'} colorScheme="green" onClick={updateImage}>Save</Button>}
+                    {isEditing && <Button isDisabled={data === image ? true : false} size={['sm', 'md']} mt={'20px'} colorScheme="green" onClick={updateImage}>Save</Button>}
                 </CardFooter>    
             </Card>
         </Flex>
