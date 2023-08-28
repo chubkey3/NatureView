@@ -1,7 +1,7 @@
 import { Flex, Radio, RadioGroup, Textarea } from "@chakra-ui/react"
 import Image from "next/image"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
-import { ChakraStylesConfig, Select } from 'chakra-react-select'
+import { Select } from 'chakra-react-select'
 import { Tag } from "@prisma/client"
 import chakraStyles from "../util/ChakraStyles"
 

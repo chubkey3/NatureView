@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardFooter, Flex, HStack, Icon, IconButton, Skeleton, Spinner, Tag, Text, Textarea, useToast } from "@chakra-ui/react"
+import { Button, Card, CardBody, CardFooter, Flex, HStack, Icon, IconButton, Spinner, Tag, Text, Textarea, useToast } from "@chakra-ui/react"
 import { Image as ImageSchema, Tag as TagSchema } from "@prisma/client"
 import axios from "axios"
 import { GetServerSideProps, NextPage } from "next"
@@ -6,11 +6,10 @@ import Image from "next/image"
 import { useRouter } from "next/router"
 import { BsFillPersonFill } from "react-icons/bs"
 import { FiEdit } from 'react-icons/fi'
-import { IoMdArrowRoundBack } from 'react-icons/io'
 import { BiTime } from 'react-icons/bi'
 import { useCallback, useState } from "react"
 import { HiOutlineTrash } from 'react-icons/hi'
-import { ChakraStylesConfig, Select } from "chakra-react-select"
+import { Select } from "chakra-react-select"
 import chakraStyles from "../../util/ChakraStyles"
 
 interface ImageSchemaWithTags extends ImageSchema {
@@ -52,10 +51,7 @@ const ImagePage: NextPage<Props> = ({image, tags}) => {
     }, [router, toast, data])
 
     return (
-        <Flex justifyContent={'center'} alignItems={'center'} flexDir={'column'}>            
-            {/*<Flex w={'60%'} minW={'300px'}>
-                <IconButton aria-label="back buttton" as={IoMdArrowRoundBack} colorScheme="green" ml={1} size={'xs'} onClick={() => router.push('/')}/>                
-    </Flex>*/}
+        <Flex justifyContent={'center'} alignItems={'center'} flexDir={'column'}>                    
             <Card w={'60%'} mt={['10px', '20px']} display={'flex'} minW={'300px'} maxH={!isEditing ? 'calc(100vh - 200px)' : ''} mb={isEditing ? '100px' : ''}>        
                 <Flex alignSelf={['initial', 'end']} justifyContent={'space-between'} mb={1} mt={1}>
                     <IconButton size={'sm'} aria-label="edit image" m={2} as={FiEdit} colorScheme="blue" p={1} onClick={() => {setIsEditing(prevState => !prevState)}}/>        
@@ -63,8 +59,7 @@ const ImagePage: NextPage<Props> = ({image, tags}) => {
                 </Flex>
                 <Flex justifyContent={'center'} flexDir={'column'} alignItems={'center'}>
                     <Flex flexDir={'column'} pos={'relative'} alignItems={'center'} maxH={'45vh'} maxW={'90%'}>
-                        {!isLoaded && <Spinner pos={'absolute'} my={'20px'} size={'xl'}/>}
-                        {/*<Skeleton w={'100%'} h={'100%'} pos={'absolute'} isLoaded={isLoaded}/>*/}
+                        {!isLoaded && <Spinner pos={'absolute'} my={'20px'} size={'xl'}/>}                       
                         <Image onLoadingComplete={() => setIsLoaded(true)} style={{objectFit: 'contain', width: 'auto', height: '100%', maxHeight: '45vh', borderRadius: '5px'}} src={image.url} priority={true} width={1000} height={0} alt="nature image :)"/>
                         
                     </Flex>       
