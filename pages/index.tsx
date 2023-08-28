@@ -170,16 +170,7 @@ const Home: NextPage<Props> = ({ images }) => {
     </div>
   )
 }
-/*
-<div className={styles.gallary}>                                
-          {images.map((image, i) => (
-            <div key={image.id} className={styles.test}>
-              {<h3 key={JSON.stringify(image.lastModified)}>{image.lastModified && new Date(image.lastModified).toDateString()}</h3>}
-              <Image priority={false} placeholder='empty' loading={'lazy'} key={image.url} fill={true} alt={'snapshot of nature :)'} src={image.url}/>
-            </div>
-          ))}
-        </div>
-*/
+
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   try {
