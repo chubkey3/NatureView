@@ -9,6 +9,7 @@ import UploadConfigure from './UploadConfigure';
 import { AiOutlinePlus } from 'react-icons/ai'
 import { Tag } from '@prisma/client';
 import s3 from '../util/S3init';
+import { ImageOptionsObject } from '../types/ImageOptions';
 
 
 const Uploader = () => {

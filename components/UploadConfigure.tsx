@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { Select } from 'chakra-react-select'
 import { Tag } from "@prisma/client"
 import chakraStyles from "../util/ChakraStyles"
+import { ImageOptions, ImageOptionsObject } from "../types/ImageOptions"
 
 
 const UploadConfigure = ({img, tags, setOptionsParent}: {img: File, tags: Tag[], setOptionsParent: Dispatch<SetStateAction<ImageOptionsObject>>}) => {
