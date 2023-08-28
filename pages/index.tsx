@@ -2,7 +2,6 @@ import type { GetServerSideProps, NextPage } from 'next'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import axios from 'axios'
-import { Image as ImageSchema, Tag as TagSchema } from '@prisma/client'
 import { SimpleGrid, Flex, Text, Link, Divider, Tag, useToast, Input, InputGroup, InputRightAddon, Fade, Wrap, WrapItem, useMediaQuery, IconButton, useDisclosure, Button, AlertDialog, AlertDialogContent, AlertDialogCloseButton, AlertDialogHeader, AlertDialogBody, AlertDialogFooter, AlertDialogOverlay } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -11,25 +10,14 @@ import toBase64 from '../util/toBase64'
 import { AiOutlineSearch } from 'react-icons/ai'
 import { IoFilter } from 'react-icons/io5'
 import InfiniteScroll from 'react-infinite-scroll-component'
-
-interface ImageSchemaWithTags extends ImageSchema {
-  tags?: TagSchema[]
-}
-
-type Data = {
-  [key: string]: ImageSchemaWithTags[]
-}
+import ImageData from '../types/ImageData'
 
 type Props = {
-  images: Data  
+  images: ImageData  
 }
 
-type Date = {
-  month: string,
-  year: string
-}
+let quality = 430
 
-let quality = 430;
 
 const Home: NextPage<Props> = ({ images }) => {
 
@@ -37,9 +25,9 @@ const Home: NextPage<Props> = ({ images }) => {
   const toast = useToast()
 
   const [page, setPage] = useState<number>(1);
-  const [data, setData] = useState<Data>(images);
+  const [data, setData] = useState<ImageData>(images);
   const [search, setSearch] = useState<string>("")
-  const [dateQuery, setDateQuery] = useState<Date>()
+  const [dateQuery, setDateQuery] = useState<{month: string, year: string}>()
   const [hasMore, setHasMore] = useState<boolean>(true)
 
   const isMobile = useMediaQuery('(min-width: 1000px)', {ssr: true, fallback: false})

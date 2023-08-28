@@ -1,16 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../lib/prisma'
 import { Image } from '@prisma/client'
+import GroupByDate from '../../types/GroupByDate';
 
-interface GroupByDate {
-  [key: string]: Image[]
-}
-
-type Data = Image[] | {message: string} | GroupByDate
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<Image[] | {message: string} | GroupByDate>
 ) {
 
   let take = 10;

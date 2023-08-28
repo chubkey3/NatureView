@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, CardFooter, Flex, HStack, Icon, IconButton, Spinner, Tag, Text, Textarea, useToast } from "@chakra-ui/react"
-import { Image as ImageSchema, Tag as TagSchema } from "@prisma/client"
+import { Tag as TagSchema } from "@prisma/client"
 import axios from "axios"
 import { GetServerSideProps, NextPage } from "next"
 import Image from "next/image"
@@ -11,10 +11,8 @@ import { useCallback, useState } from "react"
 import { HiOutlineTrash } from 'react-icons/hi'
 import { Select } from "chakra-react-select"
 import chakraStyles from "../../util/ChakraStyles"
+import { ImageSchemaWithTags } from "../../types/ImageExtended"
 
-interface ImageSchemaWithTags extends ImageSchema {
-    tags: TagSchema[]
-}
 
 type Props = {
     image: ImageSchemaWithTags,

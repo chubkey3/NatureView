@@ -5,20 +5,10 @@ import { Select } from 'chakra-react-select'
 import { Tag } from "@prisma/client"
 import chakraStyles from "../util/ChakraStyles"
 
-interface ImageOptionsChild {
-    author: "JASON" | "CHRISTINA",
-    tags: string[],
-    description: string
-}
 
-interface ImageOptionsParent {
-    [key: string] : ImageOptionsChild            
-}
-
-
-const UploadConfigure = ({img, tags, setOptionsParent}: {img: File, tags: Tag[], setOptionsParent: Dispatch<SetStateAction<ImageOptionsParent>>}) => {
+const UploadConfigure = ({img, tags, setOptionsParent}: {img: File, tags: Tag[], setOptionsParent: Dispatch<SetStateAction<ImageOptionsObject>>}) => {
     const [imgSrc, setImgSrc] = useState<string>("")    
-    const [options, setOptions] = useState<ImageOptionsChild>({author: "JASON", tags: [], description: ""})
+    const [options, setOptions] = useState<ImageOptions>({author: "JASON", tags: [], description: ""})
     const [input, setInput] = useState<string>("")
 
     useEffect(() => {

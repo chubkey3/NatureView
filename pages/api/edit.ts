@@ -1,11 +1,7 @@
-import { Image, Tag } from '@prisma/client';
 import prisma from '../../lib/prisma'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { ImageSchemaWithTags } from '../../types/ImageExtended';
 
-
-interface ImageSchemaWithTags extends Image {
-    tags: Tag[]
-}
 
 export default async function handler(
     req: NextApiRequest,

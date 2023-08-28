@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { useState, useCallback, useEffect, useRef } from "react";
 import { nanoid } from 'nanoid'
 import axios from "axios";
@@ -11,21 +11,12 @@ import { Tag } from '@prisma/client';
 import s3 from '../util/S3init';
 
 
-interface ImageOptions {
-    [key: string] : {
-        author: "JASON" | "CHRISTINA",
-        tags: string[],
-        description: string
-    }
-}
-
-
 const Uploader = () => {
     const [inputFiles, setInputFiles] = useState<File[]>([]);
     const [dragActive, setDragActive] = useState<boolean>(false);
     const [completedUploads, updateCompletedUploads] = useState<number>(0);
     const [uploading, toggleUploading] = useState<boolean>(false);
-    const [imgOptions, setImgOptions] = useState<ImageOptions>({});
+    const [imgOptions, setImgOptions] = useState<ImageOptionsObject>({});
     const [tags, setTags] = useState<Tag[]>([]);
 
     const inputRef = useRef<HTMLInputElement>(null);

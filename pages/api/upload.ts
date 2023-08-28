@@ -1,21 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from '../../lib/prisma'
-import { Image } from '@prisma/client'
+import { ImageSchemaWithStringTags } from '../../types/ImageExtended'
 
-type Data = {message: string}
-
-interface Params extends Image {
-  tags?: string[]
-}
 
 const colors = ["blackAlpha", "gray", "red", "orange", "yellow", "green", "teal", "blue", "cyan", "purple", "pink", "linkedin", "facebook", "messenger", "whatsapp", "twitter", "telegram" ] 
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>
+  res: NextApiResponse<{message: string}>
 ) {
     if (req.method === "POST"){
-        let params: Params = req.body
+        let params: ImageSchemaWithStringTags = req.body
         let test = []
 
         if (params.tags) {
