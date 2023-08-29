@@ -29,32 +29,61 @@ const Uploader = () => {
         
             toggleUploading(true);
           
-            for (let i = 0; i<inputFiles.length; i++) {
-                let params = {
-                Body: inputFiles[i],
-                Bucket: process.env.BUCKET_NAME,
-                Key: 'images/' + nanoid() + '.' + inputFiles[i].name.split('.').pop(),          
-                ACL: 'public-read'       
-            }
-            
-            const command = new PutObjectCommand(params)
-            
-            s3.send(command)
-            .then(() => {
-                if (!params.Key) return
-                let url = `https://${process.env.BUCKET_NAME}.${process.env.BUCKET_CDN_ENDPOINT}/${params.Key}`
-                let id = params.Key.split('/').pop()?.split('.')[0]
-                
-                axios.post('/api/upload', {...{id: id, url: url, lastModified: inputFiles[i].lastModified}, ...{...imgOptions[inputFiles[i].name]}}, {
-                    onUploadProgress(progressEvent) {
-                        if (progressEvent.total && progressEvent.loaded/progressEvent.total === 1) {
-                            updateCompletedUploads(prevState => prevState + 1);
-                        }
+            for (let i = 0; i<inputFiles.length; i++) {     
+                if (inputFiles[i].type.split('/')[0] === 'image') {
+
+                    let params = {
+                        Body: inputFiles[i],
+                        Bucket: process.env.BUCKET_NAME,
+                        Key: 'images/' + nanoid() + '.' + inputFiles[i].name.split('.').pop(),          
+                        ACL: 'public-read'       
                     }
-                })           
-            })                 
+                
+                    const command = new PutObjectCommand(params)
+                    
+                    s3.send(command)
+                    .then(() => {
+                        if (!params.Key) return
+                        let url = `https://${process.env.BUCKET_NAME}.${process.env.BUCKET_CDN_ENDPOINT}/${params.Key}`
+                        let id = params.Key.split('/').pop()?.split('.')[0]
+                        
+                        axios.post('/api/image/upload', {...{id: id, url: url, lastModified: inputFiles[i].lastModified}, ...{...imgOptions[inputFiles[i].name]}}, {
+                            onUploadProgress(progressEvent) {
+                                if (progressEvent.total && progressEvent.loaded/progressEvent.total === 1) {
+                                    updateCompletedUploads(prevState => prevState + 1);
+                                }
+                            }
+                        })           
+                    })                 
+                } else if (inputFiles[i].type.split('/')[0] === 'video') {
+
+                    const form = new FormData()
+
+                    form.append('video', inputFiles[i])
+
+                    axios.post('/api/video/upload', form, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    }).then((res) => {
+
+                        if (!res.data.url) return
+
+                        let url = res.data.url
+                        let id = url.split('/').pop().split('.')[0]
+
+                        axios.post('/api/image/upload', {...{id: id, url: url, lastModified: inputFiles[i].lastModified}, ...{...imgOptions[inputFiles[i].name]}}, {
+                            onUploadProgress(progressEvent) {
+                                if (progressEvent.total && progressEvent.loaded/progressEvent.total === 1) {
+                                    updateCompletedUploads(prevState => prevState + 1);
+                                }
+                            }
+                        })
+                    })                
+                }
+            }                           
         }
-      }
+
     }, [inputFiles, imgOptions])
 
     useEffect(() => {
@@ -99,7 +128,7 @@ const Uploader = () => {
     return (
         <Flex w={'60%'} maxW={'450px'} flexDir={'column'} justifyContent={(inputFiles.length > 0) ? ['start', 'center'] : 'center'} alignItems={'center'} h={'75vh'}>
             <Flex hidden={inputFiles.length === 0 ? false : true} p={5} w={'100%'} h={'200px'} alignItems={'center'} justifyContent={'center'} border={'3px dashed rgb(134, 239, 172)'} cursor={'pointer'} onDrop={handleDrop} onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onClick={triggerFileUpload} bgColor={dragActive ? 'green.200' : '#dcfce7'}>
-                <Input ref={inputRef} hidden={true} type="file" accept="image/*" onChange={(e) => setInputFiles(Array.from(inputFiles).concat(Array.from(e.target.files || [])))} multiple/>
+                <Input ref={inputRef} hidden={true} type="file" accept={"video/mp4,video/x-m4v,video/*,image/*"} onChange={(e) => setInputFiles(Array.from(inputFiles).concat(Array.from(e.target.files || [])))} multiple/>
                 <Flex flexDir={'column'} alignItems={'center'} color={'green.700'}>
                     <BsImages fontSize={'60px'}/>  
                     <Text mt={5} fontSize={'xl'}>Drag & drop to upload</Text>

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import prisma from '../../lib/prisma'
-import { ImageSchemaWithStringTags } from '../../types/ImageExtended'
+import prisma from '../../../lib/prisma'
+import { ImageSchemaWithStringTags } from '../../../types/ImageExtended'
 
 
 const colors = ["blackAlpha", "gray", "red", "orange", "yellow", "green", "teal", "blue", "cyan", "purple", "pink", "linkedin", "facebook", "messenger", "whatsapp", "twitter", "telegram" ] 
